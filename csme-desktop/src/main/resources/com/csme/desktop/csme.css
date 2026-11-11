@@ -1,0 +1,313 @@
+/*
+ * CSME ERP — couche visuelle au-dessus d'AtlantaFX Cupertino.
+ * Principes macOS : barre latérale translucide, sélection en pastille, cartes à grands rayons,
+ * typographie sobre, hiérarchie par le poids et la couleur plutôt que par les bordures.
+ * Toutes les couleurs viennent des variables du thème : le mode sombre est automatique.
+ */
+
+.root {
+    -fx-font-size: 13px;
+    -csme-radius: 10px;
+}
+
+.csme-icon {
+    -fx-fill: transparent;
+    -fx-stroke: -color-fg-default;
+    -fx-stroke-width: 1.8;
+}
+
+/* ------------------------------------------------------------------ fenêtre */
+.csme-window {
+    -fx-background-color: -color-bg-default;
+}
+
+/* ------------------------------------------------------------------ barre latérale */
+.csme-sidebar {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent -color-border-muted transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-pref-width: 248px;
+    -fx-min-width: 248px;
+}
+
+.csme-brand {
+    -fx-padding: 18 16 14 18;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+}
+
+.csme-logo {
+    -fx-background-color: linear-gradient(to bottom right, #0a84ff, #5e5ce6);
+    -fx-background-radius: 9px;
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-width: 34px;
+    -fx-max-height: 34px;
+    -fx-alignment: center;
+}
+
+.csme-logo .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.csme-brand-name {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.csme-nav-section {
+    -fx-text-fill: -color-fg-subtle;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 0 4 22;
+}
+
+.csme-nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 7px;
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 10;
+    -fx-text-fill: -color-fg-default;
+    -fx-cursor: hand;
+}
+
+.csme-nav-item:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.csme-nav-item:selected {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.csme-nav-item:selected .csme-icon {
+    -fx-stroke: -color-fg-emphasis;
+}
+
+.csme-nav-item:disabled {
+    -fx-opacity: 0.55;
+}
+
+.csme-nav-phase {
+    -fx-font-size: 10px;
+    -fx-text-fill: -color-fg-subtle;
+    -fx-background-color: -color-neutral-muted;
+    -fx-background-radius: 6px;
+    -fx-padding: 1 6 1 6;
+}
+
+.csme-user-card {
+    -fx-padding: 12 14 14 14;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-border-color: -color-border-muted transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.csme-avatar {
+    -fx-background-color: -color-accent-subtle;
+    -fx-background-radius: 50%;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-alignment: center;
+}
+
+.csme-avatar .label {
+    -fx-text-fill: -color-accent-fg;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ barre supérieure */
+.csme-topbar {
+    -fx-padding: 12 24 12 24;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.csme-topbar-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.csme-status {
+    -fx-background-radius: 999px;
+    -fx-padding: 3 10 3 8;
+    -fx-spacing: 6;
+    -fx-alignment: center;
+    -fx-background-color: -color-bg-subtle;
+}
+
+.csme-status-dot {
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+    -fx-background-radius: 50%;
+}
+
+.csme-status-online .csme-status-dot { -fx-background-color: -color-success-emphasis; }
+.csme-status-offline .csme-status-dot { -fx-background-color: -color-danger-emphasis; }
+.csme-status-checking .csme-status-dot { -fx-background-color: -color-warning-emphasis; }
+
+/* ------------------------------------------------------------------ contenu */
+.csme-content {
+    -fx-background-color: -color-bg-default;
+}
+
+.csme-page {
+    -fx-padding: 24 28 28 28;
+    -fx-spacing: 18;
+}
+
+.csme-card {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-border-muted;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 12, 0, 0, 2);
+}
+
+.csme-kpi {
+    -fx-padding: 16 18 16 18;
+    -fx-spacing: 6;
+}
+
+.csme-kpi-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.csme-kpi-label {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.csme-kpi-icon {
+    -fx-background-color: -color-accent-subtle;
+    -fx-background-radius: 8px;
+    -fx-padding: 6;
+}
+
+.csme-kpi-icon .csme-icon {
+    -fx-stroke: -color-accent-fg;
+}
+
+.csme-kpi-danger .csme-kpi-icon { -fx-background-color: -color-danger-subtle; }
+.csme-kpi-danger .csme-kpi-icon .csme-icon { -fx-stroke: -color-danger-fg; }
+.csme-kpi-success .csme-kpi-icon { -fx-background-color: -color-success-subtle; }
+.csme-kpi-success .csme-kpi-icon .csme-icon { -fx-stroke: -color-success-fg; }
+
+.csme-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999px;
+    -fx-padding: 2 8 2 8;
+}
+
+.csme-badge-success { -fx-background-color: -color-success-subtle; -fx-text-fill: -color-success-fg; }
+.csme-badge-danger  { -fx-background-color: -color-danger-subtle;  -fx-text-fill: -color-danger-fg; }
+.csme-badge-warning { -fx-background-color: -color-warning-subtle; -fx-text-fill: -color-warning-fg; }
+.csme-badge-neutral { -fx-background-color: -color-neutral-muted; -fx-text-fill: -color-fg-muted; }
+.csme-badge-accent  { -fx-background-color: -color-accent-subtle;  -fx-text-fill: -color-accent-fg; }
+
+.csme-error-banner {
+    -fx-background-color: -color-danger-subtle;
+    -fx-text-fill: -color-danger-fg;
+    -fx-background-radius: 8px;
+    -fx-padding: 9 12 9 12;
+}
+
+.csme-field-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.csme-field-error {
+    -fx-text-fill: -color-danger-fg;
+    -fx-font-size: 11px;
+}
+
+.csme-sheet {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 14px;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 40, 0.1, 0, 12);
+}
+
+.csme-activity-row {
+    -fx-padding: 9 0 9 0;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.csme-empty {
+    -fx-text-fill: -color-fg-muted;
+    -fx-padding: 24;
+}
+
+/* Tableaux plus aérés, à la macOS */
+.table-view {
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+}
+
+.table-view .table-row-cell {
+    -fx-cell-size: 40px;
+}
+
+/* ------------------------------------------------------------------ connexion */
+.csme-login-brand {
+    -fx-background-color: linear-gradient(to bottom right, #0a84ff 0%, #5e5ce6 60%, #bf5af2 100%);
+    -fx-padding: 48;
+    -fx-spacing: 14;
+    -fx-alignment: bottom-left;
+}
+
+.csme-login-brand .label {
+    -fx-text-fill: white;
+}
+
+.csme-login-headline {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.csme-login-form {
+    -fx-padding: 48;
+    -fx-spacing: 14;
+    -fx-alignment: center-left;
+    -fx-max-width: 400px;
+}
+
+.chart {
+    -fx-padding: 4 0 0 0;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: -color-border-muted;
+}
+
+.default-color0.chart-bar {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-radius: 5 5 0 0;
+}

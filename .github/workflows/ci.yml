@@ -1,0 +1,139 @@
+# =====================================================================================
+# CSME ERP — intégration continue
+#   1. server  : compile tout, tests unitaires + tests d'intégration sur un vrai PostgreSQL 16
+#                (rôles csme_owner / csme_app, RLS active) — c'est ici que l'isolation des
+#                entreprises est prouvée à chaque commit.
+#   2. windows : compile sur Windows et produit l'application de bureau (app-image + .msi)
+#                avec jpackage. Artefacts téléchargeables depuis l'onglet « Actions ».
+#   3. release : sur un tag vX.Y.Z, publie l'installateur et le jar serveur dans une Release.
+# =====================================================================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    name: Tests serveur (PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Créer les rôles et bases
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f database/init/01-roles.sql
+      - name: Compiler et tester (unitaires + intégration)
+        run: mvn -B -ntp verify
+      - name: Rapports de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-tests
+          path: |
+            **/target/surefire-reports/
+            **/target/failsafe-reports/
+          if-no-files-found: ignore
+      - name: Jar serveur
+        uses: actions/upload-artifact@v4
+        with:
+          name: csme-server
+          path: csme-server/target/csme-server.jar
+
+  windows:
+    name: Application Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Compiler le client (tests unitaires inclus)
+        shell: pwsh
+        run: mvn -B -ntp -pl csme-desktop -am package
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $v = "0.3.0"
+          if ("${{ github.ref_type }}" -eq "tag") { $v = "${{ github.ref_name }}".TrimStart("v") }
+          "value=$v" >> $env:GITHUB_OUTPUT
+      - name: Image applicative (sans installation)
+        shell: pwsh
+        run: >
+          jpackage --type app-image --name "CSME ERP" --app-version ${{ steps.version.outputs.value }}
+          --vendor "CSME" --input csme-desktop/target/app --main-jar csme-desktop.jar
+          --main-class com.csme.desktop.Launcher --dest dist
+          --java-options "-Dfile.encoding=UTF-8"
+      - name: WiX Toolset 3 (requis par jpackage pour le MSI)
+        shell: pwsh
+        run: |
+          if (-not (Get-Command candle.exe -ErrorAction SilentlyContinue)) {
+            choco install wixtoolset -y --no-progress
+            $wix = Get-ChildItem "${env:ProgramFiles(x86)}" -Directory -Filter "WiX Toolset v3*" | Select-Object -First 1
+            "$($wix.FullName)\bin" >> $env:GITHUB_PATH
+          }
+      - name: Installateur MSI
+        shell: pwsh
+        run: >
+          jpackage --type msi --name "CSME ERP" --app-version ${{ steps.version.outputs.value }}
+          --vendor "CSME" --description "CSME ERP — gestion commerciale"
+          --input csme-desktop/target/app --main-jar csme-desktop.jar
+          --main-class com.csme.desktop.Launcher --dest dist
+          --win-menu --win-menu-group "CSME" --win-shortcut --win-dir-chooser
+          --win-upgrade-uuid 6f1c2b8e-5a3d-4c1e-9b7a-3e2f1d0c9b8a
+          --java-options "-Dfile.encoding=UTF-8"
+      - name: Archiver l'image applicative
+        shell: pwsh
+        run: Compress-Archive -Path "dist/CSME ERP" -DestinationPath "dist/CSME-ERP-portable.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: csme-erp-windows
+          path: |
+            dist/*.msi
+            dist/CSME-ERP-portable.zip
+
+  release:
+    name: Publication
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [server, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/csme-erp-windows/*
+            artifacts/csme-server/csme-server.jar

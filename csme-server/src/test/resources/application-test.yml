@@ -1,0 +1,20 @@
+# Profil de test : base PostgreSQL dédiée (csme_test), recréée au démarrage du contexte.
+spring:
+  datasource:
+    url: ${CSME_TEST_DB_URL:jdbc:postgresql://localhost:5432/csme_test}
+    username: csme_app
+    password: ${CSME_TEST_DB_APP_PASSWORD:csme_app_dev}
+  flyway:
+    user: csme_owner
+    password: ${CSME_TEST_DB_OWNER_PASSWORD:csme_owner_dev}
+    clean-disabled: false
+    placeholders:
+      app_role: csme_app
+
+csme:
+  security:
+    jwt:
+      secret: test-secret-only-for-automated-tests-0123456789abcdef
+  bootstrap:
+    super-admin-email: root@csme.test
+    super-admin-password: Plateforme-2026!
