@@ -37,6 +37,8 @@ public final class Dtos {
                 u.getRoles().stream().sorted(Comparator.comparing(Role::getName))
                         .map(r -> new RoleRef(r.getId(), r.getName())).toList(),
                 u.getAgencies().stream().sorted(Comparator.comparing(Agency::getName)).map(Dtos::agencyRef).toList(),
+                u.getDepartment() == null ? null : new com.csme.shared.dto.UserDtos.DepartmentRef(
+                        u.getDepartment().getId(), u.getDepartment().getCode(), u.getDepartment().getName()),
                 u.getLastLoginAt(), u.getCreatedAt());
     }
 

@@ -56,7 +56,7 @@ class AuthFlowIT extends IntegrationTestBase {
         RoleDto cashier = roles.stream().filter(r -> r.name().equals("Caissier")).findFirst().orElseThrow();
         String email = "caisse." + t.company().code().toLowerCase() + "@example.test";
         UserDto user = call(POST(ApiRoutes.USERS), t.token(),
-                new CreateUserRequest(email, "Caissier Test", "Caissier", "Caisse-Passw0rd", Set.of(cashier.id()), Set.of()),
+                new CreateUserRequest(email, "Caissier Test", "Caissier", "Caisse-Passw0rd", Set.of(cashier.id()), Set.of(), null),
                 201, UserDto.class);
 
         for (int i = 0; i < 5; i++) {

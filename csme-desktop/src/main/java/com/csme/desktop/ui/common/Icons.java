@@ -46,6 +46,9 @@ public final class Icons {
             Map.entry("power", "M12 3v8 M6.3 6.3a8 8 0 1 0 11.4 0"),
             Map.entry("arrow-left", "M15 18l-6-6l6-6"),
             Map.entry("arrow-right", "M9 18l6-6l-6-6"),
+            Map.entry("layers", "M12 3l9 5l-9 5l-9-5z M3 13l9 5l9-5 M3 17.5l9 5l9-5"),
+            Map.entry("trash", "M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6"),
+            Map.entry("clock", "M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18z M12 7v5l3 2"),
             Map.entry("activity", "M3 12h4l3-8l4 16l3-8h4"));
 
     private Icons() {

@@ -17,6 +17,10 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
 
     Optional<Role> findByCompanyIdAndName(UUID companyId, String name);
 
+    Optional<Role> findByIdAndCompanyId(UUID id, UUID companyId);
+
+    boolean existsByCompanyIdAndNameIgnoreCase(UUID companyId, String name);
+
     long countByCompanyId(UUID companyId);
 
     @Query("select count(u) from AppUser u join u.roles r where r.id = :roleId")

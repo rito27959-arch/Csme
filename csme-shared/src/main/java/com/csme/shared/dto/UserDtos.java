@@ -14,6 +14,9 @@ public final class UserDtos {
     public record RoleRef(UUID id, String name) {
     }
 
+    public record DepartmentRef(UUID id, String code, String name) {
+    }
+
     public record UserDto(
             UUID id,
             String email,
@@ -23,6 +26,7 @@ public final class UserDtos {
             boolean locked,
             List<RoleRef> roles,
             List<AuthDtos.AgencyRef> agencies,
+            DepartmentRef department,
             Instant lastLoginAt,
             Instant createdAt) {
 
@@ -38,20 +42,29 @@ public final class UserDtos {
             String jobTitle,
             String initialPassword,
             Set<UUID> roleIds,
-            Set<UUID> agencyIds) {
+            Set<UUID> agencyIds,
+            UUID departmentId) {
         @Override
         public String toString() {
             return "CreateUserRequest[email=" + email + ", fullName=" + fullName + "]";
         }
     }
 
-    public record UpdateUserRequest(String fullName, String jobTitle, Set<UUID> roleIds, Set<UUID> agencyIds) {
+    public record UpdateUserRequest(String fullName, String jobTitle, Set<UUID> roleIds, Set<UUID> agencyIds,
+                                    UUID departmentId) {
     }
 
     public record ResetPasswordRequest(String newPassword) {
         @Override
         public String toString() {
             return "ResetPasswordRequest[***]";
+        }
+    }
+
+    /** Création ou modification d'un rôle : permissions au format MODULE:ACTION. */
+    public record SaveRoleRequest(String name, String description, Set<String> permissions) {
+        public SaveRoleRequest {
+            permissions = permissions == null ? Set.of() : Set.copyOf(permissions);
         }
     }
 

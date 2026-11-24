@@ -42,4 +42,34 @@ public final class CompanyDtos {
 
     public record SetActiveRequest(boolean active) {
     }
+
+    /** Informations générales de l'entreprise, consultées et modifiées par l'entreprise elle-même. */
+    public record CompanyProfileDto(
+            UUID id,
+            String code,
+            String name,
+            String legalName,
+            String currency,
+            String country,
+            String address,
+            String city,
+            String phone,
+            String email,
+            String website,
+            String taxId,
+            String tradeRegister) {
+    }
+
+    /** Le code, la devise et le pays ne sont pas modifiables : ils fondent les données déjà enregistrées. */
+    public record UpdateCompanyProfileRequest(
+            String name,
+            String legalName,
+            String address,
+            String city,
+            String phone,
+            String email,
+            String website,
+            String taxId,
+            String tradeRegister) {
+    }
 }

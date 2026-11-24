@@ -6,9 +6,12 @@ import com.csme.server.domain.error.NotFoundException;
 import com.csme.server.domain.error.ValidationException;
 import com.csme.server.domain.model.Agency;
 import com.csme.server.domain.model.AppUser;
+import com.csme.server.domain.model.Department;
 import com.csme.server.domain.model.Role;
 import com.csme.server.domain.rules.Checks;
 import com.csme.server.infrastructure.persistence.AgencyRepository;
+import com.csme.server.infrastructure.persistence.AuditLogRepository;
+import com.csme.server.infrastructure.persistence.DepartmentRepository;
 import com.csme.server.infrastructure.persistence.RefreshTokenRepository;
 import com.csme.server.infrastructure.persistence.RoleRepository;
 import com.csme.server.infrastructure.persistence.UserRepository;
@@ -44,17 +47,22 @@ public class UserService {
     private final UserRepository users;
     private final RoleRepository roles;
     private final AgencyRepository agencies;
+    private final DepartmentRepository departments;
+    private final AuditLogRepository auditLogs;
     private final RefreshTokenRepository refreshTokens;
     private final PasswordEncoder passwordEncoder;
     private final AuditService audit;
     private final Clock clock;
 
     public UserService(UserRepository users, RoleRepository roles, AgencyRepository agencies,
+                       DepartmentRepository departments, AuditLogRepository auditLogs,
                        RefreshTokenRepository refreshTokens, PasswordEncoder passwordEncoder,
                        AuditService audit, Clock clock) {
         this.users = users;
         this.roles = roles;
         this.agencies = agencies;
+        this.departments = departments;
+        this.auditLogs = auditLogs;
         this.refreshTokens = refreshTokens;
         this.passwordEncoder = passwordEncoder;
         this.audit = audit;
@@ -93,8 +101,11 @@ public class UserService {
         }
         AppUser user = AppUser.companyUser(companyId, email, request.fullName().strip(),
                 Checks.clean(request.jobTitle()), passwordEncoder.encode(request.initialPassword()));
-        user.replaceRoles(resolveRoles(companyId, request.roleIds()));
+        List<Role> assigned = resolveRoles(companyId, request.roleIds());
+        PermissionGuard.requireRolesHeldByActor(assigned);
+        user.replaceRoles(assigned);
         user.replaceAgencies(resolveAgencies(companyId, request.agencyIds()));
+        user.assignDepartment(resolveDepartment(companyId, request.departmentId()));
         users.save(user);
         audit.success("USER_CREATED", "User", user.getId(), null, snapshot(user));
         return Dtos.user(user, clock.instant());
@@ -116,9 +127,14 @@ public class UserService {
             throw new BusinessRuleException("SELF_LOCKOUT",
                     "Vous ne pouvez pas retirer vos propres droits d'administration des utilisateurs.");
         }
+        List<Role> addedRoles = newRoles.stream()
+                .filter(r -> user.getRoles().stream().noneMatch(existing -> existing.getId().equals(r.getId())))
+                .toList();
+        PermissionGuard.requireRolesHeldByActor(addedRoles);
         user.updateProfile(request.fullName().strip(), Checks.clean(request.jobTitle()));
         user.replaceRoles(newRoles);
         user.replaceAgencies(resolveAgencies(companyId, request.agencyIds()));
+        user.assignDepartment(resolveDepartment(companyId, request.departmentId()));
         audit.success("USER_UPDATED", "User", user.getId(), before, snapshot(user));
         return Dtos.user(user, clock.instant());
     }
@@ -153,7 +169,28 @@ public class UserService {
         audit.success("USER_PASSWORD_RESET", "User", user.getId(), null, Map.of("sessionsRevoked", true));
     }
 
+    /** Historique de connexion d'un utilisateur (connexions, échecs, déconnexions). */
+    @Transactional(readOnly = true)
+    public PageResponse<com.csme.shared.dto.AuditDtos.AuditLogDto> loginHistory(UUID id, int page, int size) {
+        UUID companyId = TenantContext.requireCompanyId();
+        AppUser user = load(id, companyId);
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE),
+                Sort.by("occurredAt").descending());
+        return Dtos.page(auditLogs.findByCompanyIdAndEntityTypeAndEntityIdAndActionIn(companyId, "User",
+                user.getId().toString(), LOGIN_ACTIONS, pageable), Dtos::audit);
+    }
+
+    private static final Set<String> LOGIN_ACTIONS = Set.of("LOGIN_SUCCESS", "LOGIN_FAILURE", "LOGOUT", "PASSWORD_CHANGE");
+
     // ------------------------------------------------------------------------------------
+
+    private Department resolveDepartment(UUID companyId, UUID departmentId) {
+        if (departmentId == null) {
+            return null;
+        }
+        return departments.findByIdAndCompanyId(departmentId, companyId)
+                .orElseThrow(() -> new ValidationException(Map.of("departmentId", "Ce département n'existe pas.")));
+    }
 
     private AppUser load(UUID id, UUID companyId) {
         return users.findByIdAndCompanyId(id, companyId).orElseThrow(() -> new NotFoundException("Utilisateur"));
@@ -200,6 +237,7 @@ public class UserService {
         map.put("active", u.isActive());
         map.put("roles", new TreeSet<>(u.getRoles().stream().map(Role::getName).toList()));
         map.put("agencies", new TreeSet<>(u.getAgencies().stream().map(Agency::getCode).toList()));
+        map.put("department", u.getDepartment() == null ? null : u.getDepartment().getCode());
         return map;
     }
 

@@ -71,6 +71,10 @@ public final class ApiClient {
         return send("PATCH", path, body, type, true);
     }
 
+    public void delete(String path) {
+        send("DELETE", path, null, null, true);
+    }
+
     public void postNoContent(String path, Object body) {
         send("POST", path, body, null, true);
     }

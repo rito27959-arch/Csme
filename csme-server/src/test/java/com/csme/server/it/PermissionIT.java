@@ -24,7 +24,7 @@ class PermissionIT extends IntegrationTestBase {
         RoleDto storekeeper = roles.stream().filter(r -> r.name().equals("Magasinier")).findFirst().orElseThrow();
         String email = "mag." + t.company().code().toLowerCase() + "@example.test";
         perform(POST(ApiRoutes.USERS), t.token(),
-                new CreateUserRequest(email, "Magasinier Test", null, "Magasin-Passw0rd", Set.of(storekeeper.id()), Set.of()), 201);
+                new CreateUserRequest(email, "Magasinier Test", null, "Magasin-Passw0rd", Set.of(storekeeper.id()), Set.of(), null), 201);
         String token = login(email, "Magasin-Passw0rd").accessToken();
 
         perform(GET(ApiRoutes.USERS), token, null, 403);
@@ -64,7 +64,7 @@ class PermissionIT extends IntegrationTestBase {
     void validationErrorsAreReportedPerField() throws Exception {
         Tenant t = newTenant("VAL");
         var error = call(POST(ApiRoutes.USERS), t.token(),
-                new CreateUserRequest("pas-une-adresse", "", null, "court", Set.of(), Set.of()), 400,
+                new CreateUserRequest("pas-une-adresse", "", null, "court", Set.of(), Set.of(), null), 400,
                 com.csme.shared.api.ApiError.class);
         assertThat(error.fieldErrors()).containsKeys("email", "fullName", "initialPassword", "roleIds");
     }

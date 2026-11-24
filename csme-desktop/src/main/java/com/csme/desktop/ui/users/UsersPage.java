@@ -67,6 +67,7 @@ public final class UsersPage extends ViewModel implements Page {
                 Tables.node("Utilisateur", this::identity),
                 Tables.text("Poste", u -> u.jobTitle() == null ? "—" : u.jobTitle()),
                 Tables.text("Rôles", u -> u.roles().stream().map(RoleRef::name).collect(Collectors.joining(", "))),
+                Tables.text("Département", u -> u.department() == null ? "—" : u.department().name()),
                 Tables.node("Statut", this::status),
                 Tables.text("Dernière connexion", u -> Formats.dateTime(u.lastLoginAt()))));
         if (canUpdate) {
@@ -128,7 +129,9 @@ public final class UsersPage extends ViewModel implements Page {
         edit.setOnAction(e -> openEditor(u));
         MenuItem reset = new MenuItem("Réinitialiser le mot de passe…");
         reset.setOnAction(e -> openReset(u));
-        menu.getItems().addAll(edit, reset);
+        MenuItem history = new MenuItem("Historique de connexion…");
+        history.setOnAction(e -> new LoginHistorySheet(ctx, overlay, u).show());
+        menu.getItems().addAll(edit, history, reset);
         if (u.locked()) {
             MenuItem unlock = new MenuItem("Déverrouiller");
             unlock.setOnAction(e -> execute(() -> ctx.api().unlockUser(u.id()), updated -> {
@@ -158,7 +161,9 @@ public final class UsersPage extends ViewModel implements Page {
     private void openEditor(UserDto existing) {
         // Les rôles et agences sont chargés avant d'ouvrir la feuille.
         execute(() -> new UserEditor.Choices(ctx.api().roles(),
-                        ctx.session().can(ErpModule.AGENCIES, Action.VIEW) ? ctx.api().agencies() : List.<AgencyDto>of()),
+                        ctx.session().can(ErpModule.AGENCIES, Action.VIEW) ? ctx.api().agencies() : List.<AgencyDto>of(),
+                        ctx.session().can(ErpModule.DEPARTMENTS, Action.VIEW) ? ctx.api().departments()
+                                : List.<com.csme.shared.dto.DepartmentDtos.DepartmentDto>of()),
                 choices -> new UserEditor(ctx, overlay, existing, choices, saved -> {
                     if (existing == null) {
                         load(0);

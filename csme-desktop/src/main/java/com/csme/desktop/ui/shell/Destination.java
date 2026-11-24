@@ -15,8 +15,11 @@ public enum Destination {
     // Entreprise
     DASHBOARD("Tableau de bord", "dashboard", ErpModule.DASHBOARD, true),
     AGENCIES("Agences", "pin", ErpModule.AGENCIES, true),
+    DEPARTMENTS("Départements", "layers", ErpModule.DEPARTMENTS, true),
     USERS("Utilisateurs", "users", ErpModule.USERS, true),
+    ROLES("Rôles et permissions", "key", ErpModule.ROLES, true),
     AUDIT("Journal d'audit", "shield", ErpModule.AUDIT, true),
+    SETTINGS("Paramètres", "settings", ErpModule.SETTINGS, true),
 
     // À venir
     HR("Ressources humaines", "briefcase", ErpModule.HR, false),

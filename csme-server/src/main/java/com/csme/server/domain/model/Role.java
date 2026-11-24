@@ -48,6 +48,11 @@ public class Role extends TenantOwnedEntity {
         replacePermissions(permissions);
     }
 
+    public void rename(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public final void replacePermissions(Collection<Permission> permissions) {
         grants.clear();
         permissions.forEach(p -> grants.add(new Grant(p.module(), p.action())));

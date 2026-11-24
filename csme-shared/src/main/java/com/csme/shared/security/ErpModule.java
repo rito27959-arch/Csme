@@ -10,6 +10,7 @@ package com.csme.shared.security;
 public enum ErpModule {
     DASHBOARD("Tableau de bord", 2),
     AGENCIES("Agences", 4),
+    DEPARTMENTS("Départements", 4),
     USERS("Utilisateurs", 5),
     ROLES("Rôles et permissions", 5),
     AUDIT("Journal d'audit", 3),

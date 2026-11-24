@@ -2,7 +2,7 @@
 
 ERP de gestion commerciale multi-entreprises : application de bureau Windows **JavaFX + AtlantaFX (thème Cupertino, inspiré de macOS)**, API centrale **Spring Boot**, base **PostgreSQL** avec isolation des entreprises garantie par la base elle-même.
 
-> Version 0.3.0 — phases 1 à 3 du cahier des charges (architecture, interface principale, authentification), plus les fondations des phases 4 et 5 (entreprises, agences, utilisateurs, rôles).
+> Version 0.4.0 — phases 1 à 5 du cahier des charges : architecture, interface principale, authentification, entreprises / agences / départements, utilisateurs, rôles et permissions.
 
 ---
 
@@ -28,7 +28,7 @@ ERP de gestion commerciale multi-entreprises : application de bureau Windows **J
 |---|---|---|
 | `csme-shared` | Contrats partagés : DTO, permissions `MODULE:ACTION`, rôles prédéfinis, routes | aucune |
 | `csme-server` | API : `domain` (entités, règles) · `application` (cas d'usage) · `infrastructure` (persistance, sécurité) · `api` (contrôleurs) · `tenancy` (isolation) | shared |
-| `csme-desktop` | Client lourd : connexion, coque (barre latérale, barre supérieure), tableaux de bord, entreprises, agences, utilisateurs, audit | shared |
+| `csme-desktop` | Client lourd : connexion, coque (barre latérale, barre supérieure), tableaux de bord, entreprises, agences, départements, utilisateurs, rôles et permissions, paramètres, audit | shared |
 
 Les règles d'architecture (le domaine ne dépend de rien, les contrôleurs ne touchent jamais la persistance) sont vérifiées à chaque build par **ArchUnit**.
 
@@ -46,6 +46,7 @@ La portée « système » (contournement RLS) n'est accessible que par `SystemTr
 - **Verrouillage** après 5 échecs (15 min), message d'erreur générique, temps de réponse égalisé pour les comptes inconnus.
 - Permissions **module × action** vérifiées **côté serveur** sur chaque point d'entrée (refus par défaut ; un test échoue si un point d'entrée n'a pas d'annotation de sécurité).
 - **Journal d'audit** immuable : l'API n'a que `SELECT, INSERT` sur `audit_logs`. Valeurs avant/après, acteur, entreprise, IP, résultat. Les refus d'accès sont journalisés.
+- **Pas d'élévation de privilèges** : on ne peut accorder (à un rôle ou à un compte) que des permissions que l'on possède ; impossible de se retirer son propre droit de gérer les rôles ; le rôle « Directeur général » est verrouillé.
 - Erreurs sans trace technique (référence à rechercher dans les journaux serveur).
 - Client : HTTPS obligatoire hors poste local, jetons en mémoire uniquement.
 
@@ -115,8 +116,8 @@ Adresse du serveur, par ordre de priorité : `-Dcsme.server.url=…`, variable `
 | 1 | Solution, modules, dépendances, modèle initial, migrations | ✅ |
 | 2 | Interface principale : coque, navigation, tableaux de bord, thème clair/sombre | ✅ |
 | 3 | Authentification : connexion, rafraîchissement, déconnexion, changement de mot de passe, verrouillage | ✅ |
-| 4 | Entreprises et agences | 🟡 création/activation d'entreprises, CRUD des agences ; départements et paramètres à venir |
-| 5 | Utilisateurs et permissions | 🟡 utilisateurs complets, rôles prédéfinis en lecture ; éditeur de permissions à venir |
+| 4 | Entreprises et agences | ✅ entreprises (plateforme), informations générales, agences, départements rattachés aux agences |
+| 5 | Utilisateurs et permissions | ✅ utilisateurs (rôles, agences, département, historique de connexion), rôles personnalisables, matrice module × action |
 | 6 → 18 | RH, clients, produits, stocks, achats, ventes, caisse, finance… | ⏳ visibles dans la barre latérale avec leur phase |
 
 ### Hypothèses à confirmer par CSME
@@ -124,5 +125,7 @@ Adresse du serveur, par ordre de priorité : `-Dcsme.server.url=…`, variable `
 - **Rôles prédéfinis** : leurs permissions par défaut (voir `DefaultRoles`) sont une proposition raisonnable, modifiable par entreprise.
 - **Politique de mot de passe** : 10 caractères minimum, lettres et chiffres.
 - **Durées** : session 15 min renouvelée automatiquement, reconnexion après 12 h, verrouillage 15 min après 5 échecs.
+- **Changement de permissions** : appliqué aux utilisateurs concernés à leur prochain renouvellement de session (15 min au plus).
+- **Paramètres** : le code, la devise et le pays de l'entreprise ne sont pas modifiables après création ; les postes restent un champ texte jusqu'au module RH (phase 6).
 - **Tableau de bord** : seuls les indicateurs calculables avec les modules livrés sont affichés (comptes, agences, connexions, activité). Chiffre d'affaires, stock, dépenses… apparaîtront avec leurs modules — aucun chiffre fictif n'est affiché.
 - Aucune devise, taux fiscal ou plan comptable n'est imposé : la devise et le pays sont saisis à la création de l'entreprise.

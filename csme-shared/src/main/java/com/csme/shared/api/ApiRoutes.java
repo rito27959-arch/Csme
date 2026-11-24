@@ -19,6 +19,8 @@ public final class ApiRoutes {
     public static final String PLATFORM_COMPANIES = PLATFORM + "/companies";
 
     public static final String AGENCIES = BASE + "/agencies";
+    public static final String DEPARTMENTS = BASE + "/departments";
+    public static final String COMPANY_PROFILE = BASE + "/company";
     public static final String USERS = BASE + "/users";
     public static final String ROLES = BASE + "/roles";
     public static final String AUDIT = BASE + "/audit";

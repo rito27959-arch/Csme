@@ -6,6 +6,7 @@ import com.csme.desktop.ui.common.Ui;
 import com.csme.desktop.ui.common.ViewModel;
 import com.csme.shared.dto.AgencyDtos.AgencyDto;
 import com.csme.shared.dto.AuthDtos.AgencyRef;
+import com.csme.shared.dto.DepartmentDtos.DepartmentDto;
 import com.csme.shared.dto.UserDtos.CreateUserRequest;
 import com.csme.shared.dto.UserDtos.RoleDto;
 import com.csme.shared.dto.UserDtos.RoleRef;
@@ -30,7 +31,7 @@ import javafx.scene.layout.VBox;
 /** Feuille de création / modification d'un utilisateur. */
 final class UserEditor extends ViewModel {
 
-    record Choices(List<RoleDto> roles, List<AgencyDto> agencies) {
+    record Choices(List<RoleDto> roles, List<AgencyDto> agencies, List<DepartmentDto> departments) {
     }
 
     private final AppContext ctx;
@@ -61,7 +62,12 @@ final class UserEditor extends ViewModel {
         for (RoleDto r : choices.roles()) {
             CheckBox box = new CheckBox(r.name());
             box.setSelected(currentRoles.contains(r.id()));
-            if (r.description() != null) {
+            boolean grantable = r.permissions().stream().allMatch(p -> ctx.session().user().can(p));
+            if (!grantable && !box.isSelected()) {
+                box.setDisable(true);
+                box.setTooltip(new Tooltip("Ce rôle accorde des permissions que vous ne possédez pas."));
+            }
+            if (r.description() != null && box.getTooltip() == null) {
                 box.setTooltip(new Tooltip(r.description()));
             }
             roleBoxes.put(r.id(), box);
@@ -80,6 +86,27 @@ final class UserEditor extends ViewModel {
             agencies.getChildren().add(box);
         }
 
+        javafx.scene.control.ComboBox<DepartmentDto> department = new javafx.scene.control.ComboBox<>();
+        department.getItems().add(null);
+        department.getItems().addAll(choices.departments().stream()
+                .filter(d -> d.active() || (!creating && existing.department() != null && d.id().equals(existing.department().id())))
+                .toList());
+        department.setMaxWidth(Double.MAX_VALUE);
+        javafx.util.Callback<javafx.scene.control.ListView<DepartmentDto>, javafx.scene.control.ListCell<DepartmentDto>> cells =
+                l -> new javafx.scene.control.ListCell<>() {
+                    @Override
+                    protected void updateItem(DepartmentDto d, boolean empty) {
+                        super.updateItem(d, empty);
+                        setText(empty ? null : d == null ? "Aucun département" : d.name() + " — " + d.agency().name());
+                    }
+                };
+        department.setCellFactory(cells);
+        department.setButtonCell(cells.call(null));
+        if (!creating && existing.department() != null) {
+            department.getItems().stream().filter(d -> d != null && d.id().equals(existing.department().id()))
+                    .findFirst().ifPresent(department::setValue);
+        }
+
         Ui.Form form = new Ui.Form();
         form.field("fullName", "Nom complet", fullName);
         if (creating) {
@@ -90,6 +117,9 @@ final class UserEditor extends ViewModel {
                 .field("roleIds", "Rôles", roles);
         if (!choices.agencies().isEmpty()) {
             form.field("agencyIds", "Agences autorisées", agencies);
+        }
+        if (!choices.departments().isEmpty()) {
+            form.field("departmentId", "Département", department);
         }
         form.bindErrors(fieldErrorsProperty());
 
@@ -104,10 +134,11 @@ final class UserEditor extends ViewModel {
             Set<UUID> agencyIds = selected(agencyBoxes);
             if (creating) {
                 CreateUserRequest request = new CreateUserRequest(email.getText(), fullName.getText(), jobTitle.getText(),
-                        password.getText(), roleIds, agencyIds);
+                        password.getText(), roleIds, agencyIds, departmentId(department));
                 execute(() -> ctx.api().createUser(request), this::done);
             } else {
-                UpdateUserRequest request = new UpdateUserRequest(fullName.getText(), jobTitle.getText(), roleIds, agencyIds);
+                UpdateUserRequest request = new UpdateUserRequest(fullName.getText(), jobTitle.getText(), roleIds, agencyIds,
+                        departmentId(department));
                 execute(() -> ctx.api().updateUser(existing.id(), request), this::done);
             }
         });
@@ -123,6 +154,10 @@ final class UserEditor extends ViewModel {
         overlay.close();
         overlay.success(existing == null ? "Compte créé pour " + saved.fullName() + "." : "Modifications enregistrées.");
         onSaved.accept(saved);
+    }
+
+    private static UUID departmentId(javafx.scene.control.ComboBox<DepartmentDto> box) {
+        return box.getValue() == null ? null : box.getValue().id();
     }
 
     private static Set<UUID> selected(Map<UUID, CheckBox> boxes) {

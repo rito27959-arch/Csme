@@ -85,7 +85,9 @@ public final class AgenciesPage extends ViewModel implements Page {
             replace(updated);
             overlay.success("Agence " + (updated.active() ? "rouverte" : "fermée") + ".");
         }, err -> overlay.error(err.getMessage())));
-        return new HBox(4, edit, toggle);
+        HBox box = new HBox(4, edit, toggle);
+        box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return box;
     }
 
     private void replace(AgencyDto updated) {

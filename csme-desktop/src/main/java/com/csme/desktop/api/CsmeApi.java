@@ -10,6 +10,10 @@ import com.csme.shared.dto.AuthDtos.LoginRequest;
 import com.csme.shared.dto.AuthDtos.RefreshRequest;
 import com.csme.shared.dto.AuthDtos.TokenResponse;
 import com.csme.shared.dto.CompanyDtos.CompanyDto;
+import com.csme.shared.dto.CompanyDtos.CompanyProfileDto;
+import com.csme.shared.dto.CompanyDtos.UpdateCompanyProfileRequest;
+import com.csme.shared.dto.DepartmentDtos.DepartmentDto;
+import com.csme.shared.dto.DepartmentDtos.SaveDepartmentRequest;
 import com.csme.shared.dto.CompanyDtos.CreateCompanyRequest;
 import com.csme.shared.dto.CompanyDtos.SetActiveRequest;
 import com.csme.shared.dto.DashboardDtos.CompanySummary;
@@ -17,6 +21,7 @@ import com.csme.shared.dto.DashboardDtos.PlatformSummary;
 import com.csme.shared.dto.UserDtos.CreateUserRequest;
 import com.csme.shared.dto.UserDtos.ResetPasswordRequest;
 import com.csme.shared.dto.UserDtos.RoleDto;
+import com.csme.shared.dto.UserDtos.SaveRoleRequest;
 import com.csme.shared.dto.UserDtos.UpdateUserRequest;
 import com.csme.shared.dto.UserDtos.UserDto;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -94,6 +99,32 @@ public final class CsmeApi {
         return client.patch(ApiRoutes.AGENCIES + "/" + id + "/active", new SetActiveRequest(active), new TypeReference<>() { });
     }
 
+    // Départements -------------------------------------------------------------------
+    public List<DepartmentDto> departments() {
+        return client.get(ApiRoutes.DEPARTMENTS, new TypeReference<>() { });
+    }
+
+    public DepartmentDto createDepartment(SaveDepartmentRequest request) {
+        return client.post(ApiRoutes.DEPARTMENTS, request, new TypeReference<>() { });
+    }
+
+    public DepartmentDto updateDepartment(UUID id, SaveDepartmentRequest request) {
+        return client.put(ApiRoutes.DEPARTMENTS + "/" + id, request, new TypeReference<>() { });
+    }
+
+    public DepartmentDto setDepartmentActive(UUID id, boolean active) {
+        return client.patch(ApiRoutes.DEPARTMENTS + "/" + id + "/active", new SetActiveRequest(active), new TypeReference<>() { });
+    }
+
+    // Paramètres de l'entreprise --------------------------------------------------------
+    public CompanyProfileDto companyProfile() {
+        return client.get(ApiRoutes.COMPANY_PROFILE, new TypeReference<>() { });
+    }
+
+    public CompanyProfileDto updateCompanyProfile(UpdateCompanyProfileRequest request) {
+        return client.put(ApiRoutes.COMPANY_PROFILE, request, new TypeReference<>() { });
+    }
+
     // Utilisateurs & rôles -----------------------------------------------------------
     public PageResponse<UserDto> users(String query, int page, int size) {
         String q = query == null || query.isBlank() ? "" : "&q=" + URLEncoder.encode(query.strip(), StandardCharsets.UTF_8);
@@ -122,6 +153,22 @@ public final class CsmeApi {
 
     public List<RoleDto> roles() {
         return client.get(ApiRoutes.ROLES, new TypeReference<>() { });
+    }
+
+    public RoleDto createRole(SaveRoleRequest request) {
+        return client.post(ApiRoutes.ROLES, request, new TypeReference<>() { });
+    }
+
+    public RoleDto updateRole(UUID id, SaveRoleRequest request) {
+        return client.put(ApiRoutes.ROLES + "/" + id, request, new TypeReference<>() { });
+    }
+
+    public void deleteRole(UUID id) {
+        client.delete(ApiRoutes.ROLES + "/" + id);
+    }
+
+    public PageResponse<AuditLogDto> loginHistory(UUID userId, int page, int size) {
+        return client.get(ApiRoutes.USERS + "/" + userId + "/logins?page=" + page + "&size=" + size, new TypeReference<>() { });
     }
 
     // Audit --------------------------------------------------------------------------

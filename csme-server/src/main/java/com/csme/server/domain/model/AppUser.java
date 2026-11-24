@@ -64,6 +64,10 @@ public class AppUser extends BaseEntity {
     @Column(name = "password_changed_at", nullable = false)
     private Instant passwordChangedAt = Instant.now();
 
+    @jakarta.persistence.ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -165,6 +169,10 @@ public class AppUser extends BaseEntity {
         this.active = active;
     }
 
+    public void assignDepartment(Department department) {
+        this.department = department;
+    }
+
     // --- Accesseurs -----------------------------------------------------------------------
 
     public UUID getCompanyId() {
@@ -213,5 +221,9 @@ public class AppUser extends BaseEntity {
 
     public Set<Agency> getAgencies() {
         return Set.copyOf(agencies);
+    }
+
+    public Department getDepartment() {
+        return department;
     }
 }

@@ -27,7 +27,7 @@ public final class DefaultRoles {
                 new Template("Directeur adjoint", "Gestion déléguée",
                         without(everything(), Action.DELETE)),
                 new Template("Responsable RH", "Ressources humaines",
-                        merge(full(ErpModule.HR), view(ErpModule.DASHBOARD, ErpModule.AGENCIES))),
+                        merge(full(ErpModule.HR), view(ErpModule.DASHBOARD, ErpModule.AGENCIES, ErpModule.DEPARTMENTS))),
                 new Template("Comptable", "Gestion financière et comptable",
                         merge(full(ErpModule.FINANCE, ErpModule.ACCOUNTING, ErpModule.CASH),
                                 view(ErpModule.DASHBOARD, ErpModule.SALES, ErpModule.PURCHASES, ErpModule.REPORTS))),
@@ -50,7 +50,7 @@ public final class DefaultRoles {
                         merge(actions(Set.of(ErpModule.ADMINISTRATION, ErpModule.PRODUCTIVITY), Action.VIEW, Action.CREATE, Action.UPDATE, Action.PRINT),
                                 view(ErpModule.DASHBOARD))),
                 new Template("Informaticien", "Assistance et administration technique",
-                        merge(full(ErpModule.USERS, ErpModule.SETTINGS), view(ErpModule.ROLES, ErpModule.AUDIT, ErpModule.AGENCIES))));
+                        merge(full(ErpModule.USERS, ErpModule.SETTINGS), view(ErpModule.ROLES, ErpModule.AUDIT, ErpModule.AGENCIES, ErpModule.DEPARTMENTS))));
     }
 
     private static Set<Permission> everything() {

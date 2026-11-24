@@ -61,12 +61,12 @@ class TenantIsolationIT extends IntegrationTestBase {
                 .items().getFirst();
         List<RoleDto> rolesOfB = call(GET(ApiRoutes.ROLES), b.token(), null, 200, new TypeReference<>() { });
         perform(PUT(ApiRoutes.USERS + "/" + adminOfA.id()), b.token(),
-                new UpdateUserRequest("Pirate", null, Set.of(rolesOfB.getFirst().id()), Set.of()), 404);
+                new UpdateUserRequest("Pirate", null, Set.of(rolesOfB.getFirst().id()), Set.of(), null), 404);
 
         // Utiliser un rôle de A pour créer un compte dans B : refusé.
         List<RoleDto> rolesOfA = call(GET(ApiRoutes.ROLES), a.token(), null, 200, new TypeReference<>() { });
         perform(POST(ApiRoutes.USERS), b.token(), new CreateUserRequest("intrus@example.test", "Intrus", null,
-                "Intrus-Passw0rd", Set.of(rolesOfA.getFirst().id()), Set.of()), 400);
+                "Intrus-Passw0rd", Set.of(rolesOfA.getFirst().id()), Set.of(), null), 400);
     }
 
     @Test

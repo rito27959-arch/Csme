@@ -33,7 +33,15 @@ public final class Formats {
             Map.entry("USER_ACTIVATED", "Utilisateur activé"),
             Map.entry("USER_DEACTIVATED", "Utilisateur désactivé"),
             Map.entry("USER_UNLOCKED", "Utilisateur déverrouillé"),
-            Map.entry("USER_PASSWORD_RESET", "Mot de passe réinitialisé"));
+            Map.entry("USER_PASSWORD_RESET", "Mot de passe réinitialisé"),
+            Map.entry("DEPARTMENT_CREATED", "Département créé"),
+            Map.entry("DEPARTMENT_UPDATED", "Département modifié"),
+            Map.entry("DEPARTMENT_ACTIVATED", "Département activé"),
+            Map.entry("DEPARTMENT_DEACTIVATED", "Département désactivé"),
+            Map.entry("ROLE_CREATED", "Rôle créé"),
+            Map.entry("ROLE_UPDATED", "Rôle modifié"),
+            Map.entry("ROLE_DELETED", "Rôle supprimé"),
+            Map.entry("COMPANY_PROFILE_UPDATED", "Informations de l'entreprise modifiées"));
 
     private Formats() {
     }
