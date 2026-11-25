@@ -93,6 +93,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <!-- Le jar Spring Boot réempaqueté range les classes sous BOOT-INF/ : les tests
+                         d'intégration doivent utiliser les classes compilées, pas ce jar. -->
+                    <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                     <!-- Tests d'intégration : exigent PostgreSQL (voir README / CI). -->
                     <includes>
                         <include>**/*IT.java</include>

@@ -38,8 +38,8 @@ jobs:
           --health-cmd "pg_isready -U postgres"
           --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -50,6 +50,12 @@ jobs:
         run: psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f database/init/01-roles.sql
       - name: Compiler et tester (unitaires + intégration)
         run: mvn -B -ntp verify
+      - name: Détail des échecs
+        if: failure()
+        run: |
+          for f in $(find . -path '*-reports/*' \( -name '*.dump*' -o -name '*.txt' \)); do
+            if grep -qE 'FAIL|ERROR|Exception' "$f"; then echo "===== $f"; head -c 20000 "$f"; fi
+          done
       - name: Rapports de tests
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,8 +76,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
