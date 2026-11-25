@@ -18,7 +18,9 @@ spring:
       maximum-pool-size: ${CSME_DB_POOL_SIZE:20}
       auto-commit: true
   flyway:
-    # Les migrations s'exécutent avec le rôle propriétaire du schéma.
+    # Les migrations s'exécutent avec le rôle propriétaire du schéma, sur leur propre connexion
+    # (URL explicite : la source de données de l'application est enveloppée par TenantAwareDataSource).
+    url: ${CSME_DB_URL:jdbc:postgresql://localhost:5432/csme}
     user: ${CSME_DB_OWNER_USER:csme_owner}
     password: ${CSME_DB_OWNER_PASSWORD:}
     locations: classpath:db/migration

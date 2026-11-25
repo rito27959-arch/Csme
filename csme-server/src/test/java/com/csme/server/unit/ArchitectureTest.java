@@ -2,25 +2,46 @@ package com.csme.server.unit;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-/** Garde-fous d'architecture : les couches ne se mélangent pas. */
-@AnalyzeClasses(packages = "com.csme.server", importOptions = ImportOption.DoNotIncludeTests.class)
+/**
+ * Garde-fous d'architecture : les couches ne se mélangent pas.
+ * Écrits en tests JUnit classiques (ArchRule.check) pour ne pas dépendre du moteur JUnit d'ArchUnit.
+ */
 class ArchitectureTest {
 
-    @ArchTest
-    static final ArchRule domainIsIndependent = noClasses().that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAnyPackage("..application..", "..api..", "..infrastructure..",
-                    "org.springframework..");
+    private static JavaClasses classes;
 
-    @ArchTest
-    static final ArchRule controllersDoNotTouchPersistence = noClasses().that().resideInAPackage("..api..")
-            .should().dependOnClassesThat().resideInAnyPackage("..infrastructure.persistence..", "..domain.model..");
+    @BeforeAll
+    static void importClasses() {
+        classes = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.csme.server");
+    }
 
-    @ArchTest
-    static final ArchRule applicationDoesNotDependOnApi = noClasses().that().resideInAPackage("..application..")
-            .should().dependOnClassesThat().resideInAPackage("..api..");
+    @Test
+    void domainIsIndependent() {
+        noClasses().that().resideInAPackage("..domain..")
+                .should().dependOnClassesThat().resideInAnyPackage("..application..", "..api..", "..infrastructure..",
+                        "org.springframework..")
+                .check(classes);
+    }
+
+    @Test
+    void controllersDoNotTouchPersistence() {
+        noClasses().that().resideInAPackage("..api..")
+                .should().dependOnClassesThat().resideInAnyPackage("..infrastructure.persistence..", "..domain.model..")
+                .check(classes);
+    }
+
+    @Test
+    void applicationDoesNotDependOnApi() {
+        noClasses().that().resideInAPackage("..application..")
+                .should().dependOnClassesThat().resideInAPackage("..api..")
+                .check(classes);
+    }
 }

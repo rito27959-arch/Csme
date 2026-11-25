@@ -5,6 +5,7 @@ spring:
     username: csme_app
     password: ${CSME_TEST_DB_APP_PASSWORD:csme_app_dev}
   flyway:
+    url: ${CSME_TEST_DB_URL:jdbc:postgresql://localhost:5432/csme_test}
     user: csme_owner
     password: ${CSME_TEST_DB_OWNER_PASSWORD:csme_owner_dev}
     clean-disabled: false
