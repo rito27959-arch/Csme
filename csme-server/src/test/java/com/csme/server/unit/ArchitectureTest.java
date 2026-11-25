@@ -26,14 +26,14 @@ class ArchitectureTest {
     @Test
     void domainIsIndependent() {
         noClasses().that().resideInAPackage("..domain..")
-                .should().dependOnClassesThat().resideInAnyPackage("..application..", "..api..", "..infrastructure..",
+                .should().dependOnClassesThat().resideInAnyPackage("..application..", "com.csme.server.api..", "..infrastructure..",
                         "org.springframework..")
                 .check(classes);
     }
 
     @Test
     void controllersDoNotTouchPersistence() {
-        noClasses().that().resideInAPackage("..api..")
+        noClasses().that().resideInAPackage("com.csme.server.api..")
                 .should().dependOnClassesThat().resideInAnyPackage("..infrastructure.persistence..", "..domain.model..")
                 .check(classes);
     }
@@ -41,7 +41,7 @@ class ArchitectureTest {
     @Test
     void applicationDoesNotDependOnApi() {
         noClasses().that().resideInAPackage("..application..")
-                .should().dependOnClassesThat().resideInAPackage("..api..")
+                .should().dependOnClassesThat().resideInAPackage("com.csme.server.api..")
                 .check(classes);
     }
 }
