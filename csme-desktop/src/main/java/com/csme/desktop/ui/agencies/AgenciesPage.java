@@ -1,5 +1,6 @@
 package com.csme.desktop.ui.agencies;
 
+import java.util.Optional;
 import atlantafx.base.theme.Styles;
 import com.csme.desktop.AppContext;
 import com.csme.desktop.ui.common.Formats;
@@ -39,7 +40,9 @@ public final class AgenciesPage extends ViewModel implements Page {
         this.canCreate = ctx.session().can(ErpModule.AGENCIES, Action.CREATE);
         this.canUpdate = ctx.session().can(ErpModule.AGENCIES, Action.UPDATE);
 
-        TableView<AgencyDto> table = Tables.table("Aucune agence enregistrée.");
+        TableView<AgencyDto> table = Tables.table(Ui.emptyState("pin", "Aucune agence",
+                "Les agences sont vos points de vente, bureaux ou entrepôts. Les départements et les accès des "
+                        + "utilisateurs s'y rattachent.", canCreate ? createButton() : null));
         table.getColumns().addAll(List.of(
                 Tables.text("Code", AgencyDto::code),
                 Tables.text("Nom", AgencyDto::name),
@@ -48,7 +51,8 @@ public final class AgenciesPage extends ViewModel implements Page {
                 Tables.node("Statut", a -> a.active() ? Ui.badge("Active", "success") : Ui.badge("Fermée", "neutral")),
                 Tables.text("Créée le", a -> Formats.date(a.createdAt()))));
         if (canUpdate) {
-            table.getColumns().add(Tables.node("", this::rowActions));
+            table.getColumns().add(Tables.menuColumn(this::rowActions));
+            Tables.onDoubleClick(table, this::openEditor);
         }
         table.setItems(items);
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -70,6 +74,11 @@ public final class AgenciesPage extends ViewModel implements Page {
         execute(() -> ctx.api().agencies(), items::setAll);
     }
 
+    @Override
+    public Optional<PrimaryAction> primaryAction() {
+        return canCreate ? Optional.of(new PrimaryAction("Nouvelle agence", "plus", () -> openEditor(null))) : Optional.empty();
+    }
+
     private Button createButton() {
         Button b = Ui.primary("Nouvelle agence", "plus");
         b.setOnAction(e -> openEditor(null));
@@ -77,17 +86,14 @@ public final class AgenciesPage extends ViewModel implements Page {
     }
 
     private Node rowActions(AgencyDto a) {
-        Button edit = Ui.iconButton("edit", "Modifier");
-        edit.setOnAction(e -> openEditor(a));
-        Button toggle = new Button(a.active() ? "Fermer" : "Rouvrir");
-        toggle.getStyleClass().addAll(Styles.SMALL, Styles.FLAT, a.active() ? Styles.DANGER : Styles.SUCCESS);
-        toggle.setOnAction(e -> execute(() -> ctx.api().setAgencyActive(a.id(), !a.active()), updated -> {
-            replace(updated);
-            overlay.success("Agence " + (updated.active() ? "rouverte" : "fermée") + ".");
-        }, err -> overlay.error(err.getMessage())));
-        HBox box = new HBox(4, edit, toggle);
-        box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        return box;
+        return Ui.rowMenu(
+                Ui.menuItem("Modifier…", "edit", () -> openEditor(a)),
+                new javafx.scene.control.SeparatorMenuItem(),
+                Ui.menuItem(a.active() ? "Fermer l'agence" : "Rouvrir l'agence", a.active() ? "power" : "check",
+                        () -> execute(() -> ctx.api().setAgencyActive(a.id(), !a.active()), updated -> {
+                            replace(updated);
+                            overlay.success("Agence " + (updated.active() ? "rouverte" : "fermée") + ".");
+                        }, err -> overlay.error(err.getMessage()))));
     }
 
     private void replace(AgencyDto updated) {

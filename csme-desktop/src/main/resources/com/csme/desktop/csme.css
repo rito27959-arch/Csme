@@ -1,20 +1,68 @@
 /*
  * CSME ERP — couche visuelle au-dessus d'AtlantaFX Cupertino.
- * Principes macOS : barre latérale translucide, sélection en pastille, cartes à grands rayons,
- * typographie sobre, hiérarchie par le poids et la couleur plutôt que par les bordures.
- * Toutes les couleurs viennent des variables du thème : le mode sombre est automatique.
+ *
+ * Inspirée des applications Apple :
+ *   - typographie Inter (proche de SF Pro), grands titres de page ;
+ *   - tuiles d'icônes colorées comme dans Réglages ;
+ *   - surfaces calmes, hiérarchie par le poids et la couleur plutôt que par les bordures ;
+ *   - coins généreux, ombres douces, animations courtes.
+ * Les couleurs de fond et de texte viennent des variables du thème : le mode sombre est automatique.
  */
 
 .root {
+    -fx-font-family: "Inter";
     -fx-font-size: 13px;
     -csme-radius: 10px;
+    -csme-blue: #007AFF;
+    -csme-green: #34C759;
+    -csme-indigo: #5856D6;
+    -csme-orange: #FF9500;
+    -csme-pink: #FF2D55;
+    -csme-purple: #AF52DE;
+    -csme-red: #FF3B30;
+    -csme-teal: #30B0C7;
+    -csme-yellow: #FFB800;
+    -csme-mint: #00C7BE;
+    -csme-brown: #A2845E;
+    -csme-gray: #8E8E93;
+    -csme-graphite: #636366;
 }
+
+/* Poids typographiques : JavaFX ne déduit pas le demi-gras de la famille « Inter ». */
+.csme-medium { -fx-font-family: "Inter Medium"; }
+.csme-semibold { -fx-font-family: "Inter SemiBold"; }
 
 .csme-icon {
     -fx-fill: transparent;
     -fx-stroke: -color-fg-default;
     -fx-stroke-width: 1.8;
 }
+
+/* ------------------------------------------------------------------ tuiles d'icônes (Réglages iOS) */
+.csme-tile {
+    -fx-background-radius: 7px;
+    -fx-alignment: center;
+    -fx-effect: innershadow(gaussian, rgba(255, 255, 255, 0.18), 2, 0, 0, 1);
+}
+
+.csme-tile .csme-icon {
+    -fx-stroke: white;
+    -fx-stroke-width: 2.0;
+}
+
+.csme-tint-blue     { -fx-background-color: linear-gradient(to bottom, #3395FF, #007AFF); }
+.csme-tint-green    { -fx-background-color: linear-gradient(to bottom, #5AD67A, #2FB14E); }
+.csme-tint-indigo   { -fx-background-color: linear-gradient(to bottom, #7A78E3, #5856D6); }
+.csme-tint-orange   { -fx-background-color: linear-gradient(to bottom, #FFAA33, #FF9500); }
+.csme-tint-pink     { -fx-background-color: linear-gradient(to bottom, #FF5577, #FF2D55); }
+.csme-tint-purple   { -fx-background-color: linear-gradient(to bottom, #C27BE6, #AF52DE); }
+.csme-tint-red      { -fx-background-color: linear-gradient(to bottom, #FF6259, #FF3B30); }
+.csme-tint-teal     { -fx-background-color: linear-gradient(to bottom, #55C2D4, #30B0C7); }
+.csme-tint-yellow   { -fx-background-color: linear-gradient(to bottom, #FFCC33, #FFB800); }
+.csme-tint-mint     { -fx-background-color: linear-gradient(to bottom, #33D3CB, #00C7BE); }
+.csme-tint-brown    { -fx-background-color: linear-gradient(to bottom, #B59A78, #A2845E); }
+.csme-tint-gray     { -fx-background-color: linear-gradient(to bottom, #A4A4A9, #8E8E93); }
+.csme-tint-graphite { -fx-background-color: linear-gradient(to bottom, #808085, #636366); }
 
 /* ------------------------------------------------------------------ fenêtre */
 .csme-window {
@@ -26,51 +74,53 @@
     -fx-background-color: -color-bg-subtle;
     -fx-border-color: transparent -color-border-muted transparent transparent;
     -fx-border-width: 0 1 0 0;
-    -fx-pref-width: 248px;
-    -fx-min-width: 248px;
+    -fx-pref-width: 256px;
+    -fx-min-width: 256px;
 }
 
 .csme-brand {
-    -fx-padding: 18 16 14 18;
-    -fx-spacing: 10;
+    -fx-padding: 20 16 12 18;
+    -fx-spacing: 11;
     -fx-alignment: center-left;
 }
 
 .csme-logo {
-    -fx-background-color: linear-gradient(to bottom right, #0a84ff, #5e5ce6);
-    -fx-background-radius: 9px;
-    -fx-min-width: 34px;
-    -fx-min-height: 34px;
-    -fx-max-width: 34px;
-    -fx-max-height: 34px;
+    -fx-background-color: linear-gradient(to bottom right, #2F8BFF, #5E5CE6);
+    -fx-background-radius: 10px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
     -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(10, 80, 255, 0.30), 10, 0, 0, 3);
 }
 
 .csme-logo .label {
     -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 15px;
+    -fx-font-family: "Inter Display Bold";
+    -fx-font-size: 17px;
 }
 
 .csme-brand-name {
-    -fx-font-weight: bold;
+    -fx-font-family: "Inter SemiBold";
     -fx-font-size: 14px;
 }
 
 .csme-nav-section {
     -fx-text-fill: -color-fg-subtle;
+    -fx-font-family: "Inter SemiBold";
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-padding: 14 0 4 22;
+    -fx-padding: 16 0 6 12;
 }
 
 .csme-nav-item {
     -fx-background-color: transparent;
-    -fx-background-radius: 7px;
-    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 8px;
+    -fx-padding: 5 10 5 7;
     -fx-alignment: center-left;
     -fx-graphic-text-gap: 10;
     -fx-text-fill: -color-fg-default;
+    -fx-font-size: 13px;
     -fx-cursor: hand;
 }
 
@@ -79,24 +129,32 @@
 }
 
 .csme-nav-item:selected {
-    -fx-background-color: -color-accent-emphasis;
-    -fx-text-fill: -color-fg-emphasis;
-}
-
-.csme-nav-item:selected .csme-icon {
-    -fx-stroke: -color-fg-emphasis;
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-accent-fg;
+    -fx-font-family: "Inter SemiBold";
 }
 
 .csme-nav-item:disabled {
-    -fx-opacity: 0.55;
+    -fx-opacity: 0.5;
+}
+
+.csme-nav-disclosure {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-fg-subtle;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 11px;
+    -fx-padding: 16 6 6 12;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+}
+
+.csme-nav-disclosure .csme-icon {
+    -fx-stroke: -color-fg-subtle;
 }
 
 .csme-nav-phase {
     -fx-font-size: 10px;
     -fx-text-fill: -color-fg-subtle;
-    -fx-background-color: -color-neutral-muted;
-    -fx-background-radius: 6px;
-    -fx-padding: 1 6 1 6;
 }
 
 .csme-user-card {
@@ -105,27 +163,27 @@
     -fx-alignment: center-left;
     -fx-border-color: -color-border-muted transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
+    -fx-cursor: hand;
 }
 
+.csme-user-card:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+/* ------------------------------------------------------------------ avatars */
 .csme-avatar {
-    -fx-background-color: -color-accent-subtle;
     -fx-background-radius: 50%;
-    -fx-min-width: 32px;
-    -fx-min-height: 32px;
-    -fx-max-width: 32px;
-    -fx-max-height: 32px;
     -fx-alignment: center;
 }
 
 .csme-avatar .label {
-    -fx-text-fill: -color-accent-fg;
-    -fx-font-weight: bold;
-    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-font-family: "Inter SemiBold";
 }
 
 /* ------------------------------------------------------------------ barre supérieure */
 .csme-topbar {
-    -fx-padding: 12 24 12 24;
+    -fx-padding: 10 20 10 20;
     -fx-spacing: 10;
     -fx-alignment: center-left;
     -fx-background-color: -color-bg-default;
@@ -133,17 +191,53 @@
     -fx-border-width: 0 0 1 0;
 }
 
-.csme-topbar-title {
-    -fx-font-size: 17px;
-    -fx-font-weight: bold;
+.csme-search-pill {
+    -fx-background-color: -color-bg-subtle;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-border-muted;
+    -fx-border-radius: 8px;
+    -fx-padding: 6 8 6 10;
+    -fx-spacing: 8;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+    -fx-pref-width: 340px;
+}
+
+.csme-search-pill:hover {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.csme-search-pill .label {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.csme-search-pill .csme-icon {
+    -fx-stroke: -color-fg-muted;
+}
+
+.csme-kbd {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-fg-muted;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 1 6 1 6;
 }
 
 .csme-status {
     -fx-background-radius: 999px;
-    -fx-padding: 3 10 3 8;
-    -fx-spacing: 6;
+    -fx-padding: 4 11 4 9;
+    -fx-spacing: 7;
     -fx-alignment: center;
     -fx-background-color: -color-bg-subtle;
+    -fx-cursor: hand;
+}
+
+.csme-status .label {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 12px;
 }
 
 .csme-status-dot {
@@ -154,9 +248,20 @@
     -fx-background-radius: 50%;
 }
 
-.csme-status-online .csme-status-dot { -fx-background-color: -color-success-emphasis; }
-.csme-status-offline .csme-status-dot { -fx-background-color: -color-danger-emphasis; }
-.csme-status-checking .csme-status-dot { -fx-background-color: -color-warning-emphasis; }
+.csme-status-online .csme-status-dot { -fx-background-color: -csme-green; }
+.csme-status-offline .csme-status-dot { -fx-background-color: -csme-red; }
+.csme-status-checking .csme-status-dot { -fx-background-color: -csme-orange; }
+
+.csme-profile-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2 4 2 4;
+    -fx-cursor: hand;
+}
+
+.csme-profile-button:hover {
+    -fx-background-color: -color-neutral-muted;
+    -fx-background-radius: 999px;
+}
 
 /* ------------------------------------------------------------------ contenu */
 .csme-content {
@@ -164,52 +269,56 @@
 }
 
 .csme-page {
-    -fx-padding: 24 28 28 28;
-    -fx-spacing: 18;
+    -fx-padding: 26 32 30 32;
+    -fx-spacing: 20;
+}
+
+.csme-large-title {
+    -fx-font-family: "Inter Display Bold";
+    -fx-font-size: 28px;
+}
+
+.csme-subtitle {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 13px;
+}
+
+.csme-section-title {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 15px;
 }
 
 .csme-card {
     -fx-background-color: -color-bg-default;
-    -fx-background-radius: 12px;
+    -fx-background-radius: 14px;
     -fx-border-color: -color-border-muted;
-    -fx-border-radius: 12px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 12, 0, 0, 2);
+    -fx-border-radius: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 16, 0, 0, 3);
 }
 
+/* Cartes d'indicateurs */
 .csme-kpi {
     -fx-padding: 16 18 16 18;
     -fx-spacing: 6;
 }
 
 .csme-kpi-value {
-    -fx-font-size: 28px;
-    -fx-font-weight: bold;
+    -fx-font-family: "Inter Display Bold";
+    -fx-font-size: 30px;
 }
 
 .csme-kpi-label {
     -fx-text-fill: -color-fg-muted;
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 12px;
 }
 
-.csme-kpi-icon {
-    -fx-background-color: -color-accent-subtle;
-    -fx-background-radius: 8px;
-    -fx-padding: 6;
-}
-
-.csme-kpi-icon .csme-icon {
-    -fx-stroke: -color-accent-fg;
-}
-
-.csme-kpi-danger .csme-kpi-icon { -fx-background-color: -color-danger-subtle; }
-.csme-kpi-danger .csme-kpi-icon .csme-icon { -fx-stroke: -color-danger-fg; }
-.csme-kpi-success .csme-kpi-icon { -fx-background-color: -color-success-subtle; }
-.csme-kpi-success .csme-kpi-icon .csme-icon { -fx-stroke: -color-success-fg; }
-
+/* Pastilles d'état */
 .csme-badge {
+    -fx-font-family: "Inter SemiBold";
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
     -fx-background-radius: 999px;
-    -fx-padding: 2 8 2 8;
+    -fx-padding: 3 9 3 9;
 }
 
 .csme-badge-success { -fx-background-color: -color-success-subtle; -fx-text-fill: -color-success-fg; }
@@ -221,12 +330,13 @@
 .csme-error-banner {
     -fx-background-color: -color-danger-subtle;
     -fx-text-fill: -color-danger-fg;
-    -fx-background-radius: 8px;
-    -fx-padding: 9 12 9 12;
+    -fx-background-radius: 10px;
+    -fx-padding: 10 14 10 14;
 }
 
+/* Formulaires */
 .csme-field-label {
-    -fx-font-weight: bold;
+    -fx-font-family: "Inter SemiBold";
     -fx-font-size: 12px;
     -fx-text-fill: -color-fg-muted;
 }
@@ -236,20 +346,160 @@
     -fx-font-size: 11px;
 }
 
-.csme-sheet {
-    -fx-background-color: -color-bg-default;
-    -fx-background-radius: 14px;
-    -fx-border-color: -color-border-default;
-    -fx-border-radius: 14px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 40, 0.1, 0, 12);
+.text-field, .password-field, .combo-box {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
 }
 
-.csme-activity-row {
-    -fx-padding: 9 0 9 0;
+.button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-font-family: "Inter Medium";
+}
+
+.button.accent {
+    -fx-effect: dropshadow(gaussian, rgba(0, 122, 255, 0.25), 8, 0, 0, 2);
+}
+
+/* ------------------------------------------------------------------ feuilles modales */
+.csme-sheet {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 16px;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 48, 0.08, 0, 16);
+}
+
+.csme-sheet-title {
+    -fx-font-family: "Inter Display SemiBold";
+    -fx-font-size: 19px;
+}
+
+/* ------------------------------------------------------------------ bannières de notification */
+.csme-banner {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-border-muted;
+    -fx-border-radius: 999px;
+    -fx-padding: 9 18 9 10;
     -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 24, 0.05, 0, 6);
+}
+
+.csme-banner .label {
+    -fx-font-family: "Inter Medium";
+}
+
+.csme-banner-icon {
+    -fx-background-radius: 50%;
+    -fx-min-width: 24px;
+    -fx-min-height: 24px;
+    -fx-max-width: 24px;
+    -fx-max-height: 24px;
+    -fx-alignment: center;
+}
+
+.csme-banner-icon .csme-icon {
+    -fx-stroke: white;
+    -fx-stroke-width: 2.4;
+}
+
+.csme-banner-success .csme-banner-icon { -fx-background-color: -csme-green; }
+.csme-banner-error .csme-banner-icon { -fx-background-color: -csme-red; }
+
+/* ------------------------------------------------------------------ palette de commandes (Ctrl+K) */
+.csme-palette {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 16px;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.32), 60, 0.1, 0, 20);
+}
+
+.csme-palette-input {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 17px;
+    -fx-padding: 4 0 4 0;
+}
+
+.csme-palette-input:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+.csme-palette-header {
+    -fx-padding: 14 18 12 18;
+    -fx-spacing: 12;
     -fx-alignment: center-left;
     -fx-border-color: transparent transparent -color-border-muted transparent;
     -fx-border-width: 0 0 1 0;
+}
+
+.csme-palette-header .csme-icon {
+    -fx-stroke: -color-fg-muted;
+}
+
+.csme-palette-list {
+    -fx-background-color: transparent;
+    -fx-padding: 6;
+}
+
+.csme-palette-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-padding: 7 10 7 10;
+}
+
+.csme-palette-list .list-cell:selected {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.csme-palette-list .list-cell:selected .label {
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.csme-palette-list .list-cell:selected .csme-kbd {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-border-color: rgba(255, 255, 255, 0.45);
+}
+
+.csme-palette-section {
+    -fx-text-fill: -color-fg-subtle;
+    -fx-font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ états vides */
+.csme-empty-state {
+    -fx-alignment: center;
+    -fx-spacing: 10;
+    -fx-padding: 40 24 40 24;
+}
+
+.csme-empty-icon {
+    -fx-background-color: -color-accent-subtle;
+    -fx-background-radius: 50%;
+    -fx-min-width: 56px;
+    -fx-min-height: 56px;
+    -fx-max-width: 56px;
+    -fx-max-height: 56px;
+    -fx-alignment: center;
+}
+
+.csme-empty-icon .csme-icon {
+    -fx-stroke: -color-accent-fg;
+}
+
+.csme-empty-title {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 16px;
+}
+
+.csme-empty-text {
+    -fx-text-fill: -color-fg-muted;
+    -fx-text-alignment: center;
 }
 
 .csme-empty {
@@ -257,19 +507,165 @@
     -fx-padding: 24;
 }
 
-/* Tableaux plus aérés, à la macOS */
+/* ------------------------------------------------------------------ tableau de bord */
+.csme-greeting-date {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+}
+
+.csme-quick-action {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 14px;
+    -fx-border-color: -color-border-muted;
+    -fx-border-radius: 14px;
+    -fx-padding: 14;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 12, 0, 0, 2);
+}
+
+.csme-quick-action:hover {
+    -fx-border-color: -color-accent-muted;
+    -fx-background-color: -color-bg-subtle;
+}
+
+.csme-quick-action .label {
+    -fx-font-family: "Inter Medium";
+}
+
+.csme-checklist-row {
+    -fx-padding: 10 4 10 4;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.csme-check {
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-min-width: 22px;
+    -fx-min-height: 22px;
+    -fx-max-width: 22px;
+    -fx-max-height: 22px;
+    -fx-alignment: center;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1.5;
+}
+
+.csme-check-done {
+    -fx-background-color: -csme-green;
+    -fx-border-color: -csme-green;
+}
+
+.csme-check-done .csme-icon {
+    -fx-stroke: white;
+    -fx-stroke-width: 2.6;
+}
+
+.csme-progress-track {
+    -fx-background-color: -color-neutral-muted;
+    -fx-background-radius: 999px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.csme-progress-fill {
+    -fx-background-color: -csme-green;
+    -fx-background-radius: 999px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.csme-activity-row {
+    -fx-padding: 9 0 9 0;
+    -fx-spacing: 11;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.csme-activity-dot {
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+    -fx-background-radius: 50%;
+}
+
+.csme-activity-success { -fx-background-color: -csme-green; }
+.csme-activity-warning { -fx-background-color: -csme-orange; }
+.csme-activity-danger { -fx-background-color: -csme-red; }
+
+/* ------------------------------------------------------------------ tableaux */
 .table-view {
-    -fx-background-radius: 12px;
-    -fx-border-radius: 12px;
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 14px;
+    -fx-border-color: -color-border-muted;
+    -fx-border-radius: 14px;
+    -fx-padding: 4 0 0 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 11px;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 6;
 }
 
 .table-view .table-row-cell {
-    -fx-cell-size: 40px;
+    -fx-cell-size: 48px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-row-cell:empty,
+.table-view .table-row-cell:empty:hover {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: -color-bg-subtle;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: -color-accent-subtle;
+}
+
+.table-view .table-row-cell:selected .text {
+    -fx-fill: -color-fg-default;
+}
+
+.table-view .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 0 8 0 14;
+    -fx-alignment: center-left;
+}
+
+/* Matrice des permissions */
+.csme-permission-matrix .check-box {
+    -fx-padding: 4 12 4 12;
 }
 
 /* ------------------------------------------------------------------ connexion */
 .csme-login-brand {
-    -fx-background-color: linear-gradient(to bottom right, #0a84ff 0%, #5e5ce6 60%, #bf5af2 100%);
+    -fx-background-color: linear-gradient(to bottom right, #0A6CFF 0%, #5856D6 55%, #AF52DE 100%);
     -fx-padding: 48;
     -fx-spacing: 14;
     -fx-alignment: bottom-left;
@@ -280,17 +676,37 @@
 }
 
 .csme-login-headline {
-    -fx-font-size: 30px;
-    -fx-font-weight: bold;
+    -fx-font-family: "Inter Display Bold";
+    -fx-font-size: 34px;
+}
+
+.csme-login-feature {
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+}
+
+.csme-login-feature .csme-icon {
+    -fx-stroke: white;
+}
+
+.csme-login-feature .label {
+    -fx-font-family: "Inter Medium";
+    -fx-opacity: 0.92;
 }
 
 .csme-login-form {
     -fx-padding: 48;
     -fx-spacing: 14;
     -fx-alignment: center-left;
-    -fx-max-width: 400px;
+    -fx-max-width: 420px;
 }
 
+.csme-login-title {
+    -fx-font-family: "Inter Display Bold";
+    -fx-font-size: 28px;
+}
+
+/* ------------------------------------------------------------------ graphiques */
 .chart {
     -fx-padding: 4 0 0 0;
 }
@@ -305,9 +721,18 @@
 
 .chart-horizontal-grid-lines {
     -fx-stroke: -color-border-muted;
+    -fx-stroke-dash-array: 3 4;
+}
+
+.chart .axis {
+    -fx-tick-label-fill: -color-fg-muted;
+}
+
+.chart .axis-tick-mark, .chart .axis-minor-tick-mark {
+    -fx-stroke: transparent;
 }
 
 .default-color0.chart-bar {
-    -fx-background-color: -color-accent-emphasis;
-    -fx-background-radius: 5 5 0 0;
+    -fx-background-color: linear-gradient(to top, #007AFF, #4DA3FF);
+    -fx-background-radius: 6 6 2 2;
 }

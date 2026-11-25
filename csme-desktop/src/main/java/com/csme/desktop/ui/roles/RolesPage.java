@@ -1,5 +1,6 @@
 package com.csme.desktop.ui.roles;
 
+import java.util.Optional;
 import atlantafx.base.theme.Styles;
 import com.csme.desktop.AppContext;
 import com.csme.desktop.ui.common.Overlay;
@@ -75,7 +76,7 @@ public final class RolesPage extends ViewModel implements Page {
         });
         VBox.setVgrow(list, Priority.ALWAYS);
         Label rolesTitle = new Label("Rôles");
-        rolesTitle.getStyleClass().add(Styles.TITLE_4);
+        rolesTitle.getStyleClass().add("csme-section-title");
         VBox left = new VBox(10, rolesTitle, list);
         if (canCreate) {
             Button create = Ui.secondary("Nouveau rôle", "plus");
@@ -104,7 +105,7 @@ public final class RolesPage extends ViewModel implements Page {
         matrixScroll.setFitToWidth(true);
         VBox.setVgrow(matrixScroll, Priority.ALWAYS);
         Label perms = new Label("Permissions");
-        perms.getStyleClass().add(Styles.TITLE_4);
+        perms.getStyleClass().add("csme-section-title");
         VBox editor = Ui.card(form.node(), notice, perms, matrixScroll, actions);
         VBox.setVgrow(editor, Priority.ALWAYS);
 
@@ -217,6 +218,11 @@ public final class RolesPage extends ViewModel implements Page {
                     + "ou dans 15 minutes au plus.");
         }
         setEditorDisabled(false);
+    }
+
+    @Override
+    public Optional<PrimaryAction> primaryAction() {
+        return canCreate ? Optional.of(new PrimaryAction("Nouveau rôle", "plus", this::startCreate)) : Optional.empty();
     }
 
     private void startCreate() {

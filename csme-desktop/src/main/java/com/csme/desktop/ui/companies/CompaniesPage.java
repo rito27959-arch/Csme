@@ -1,5 +1,6 @@
 package com.csme.desktop.ui.companies;
 
+import java.util.Optional;
 import atlantafx.base.theme.Styles;
 import com.csme.desktop.AppContext;
 import com.csme.desktop.ui.common.Formats;
@@ -30,15 +31,14 @@ public final class CompaniesPage extends ViewModel implements Page {
     private final AppContext ctx;
     private final Overlay overlay;
     private final ObservableList<CompanyDto> items = FXCollections.observableArrayList();
+    private final TextField search;
     private final VBox root;
 
     public CompaniesPage(AppContext ctx, Overlay overlay) {
         this.ctx = ctx;
         this.overlay = overlay;
 
-        TextField search = new TextField();
-        search.setPromptText("Rechercher une entreprise");
-        search.setPrefWidth(260);
+        search = Ui.searchField("Rechercher une entreprise", 260);
         FilteredList<CompanyDto> filtered = new FilteredList<>(items);
         search.textProperty().addListener((obs, o, n) -> {
             String q = n == null ? "" : n.strip().toLowerCase(Locale.ROOT);
@@ -49,7 +49,10 @@ public final class CompaniesPage extends ViewModel implements Page {
         Button create = Ui.primary("Nouvelle entreprise", "plus");
         create.setOnAction(e -> openCreate());
 
-        TableView<CompanyDto> table = Tables.table("Aucune entreprise. Créez la première avec « Nouvelle entreprise ».");
+        Button emptyCreate = Ui.primary("Nouvelle entreprise", "plus");
+        emptyCreate.setOnAction(e -> openCreate());
+        TableView<CompanyDto> table = Tables.table(Ui.emptyState("building", "Aucune entreprise",
+                "Chaque entreprise cliente dispose de ses propres données, strictement isolées des autres.", emptyCreate));
         table.getColumns().addAll(List.of(
                 Tables.text("Code", CompanyDto::code),
                 Tables.text("Nom", CompanyDto::name),
@@ -58,7 +61,7 @@ public final class CompaniesPage extends ViewModel implements Page {
                 Tables.text("Utilisateurs", c -> Formats.number(c.userCount())),
                 Tables.node("Statut", c -> c.active() ? Ui.badge("Active", "success") : Ui.badge("Désactivée", "neutral")),
                 Tables.text("Créée le", c -> Formats.date(c.createdAt())),
-                Tables.node("", this::rowActions)));
+                Tables.menuColumn(this::rowActions)));
         table.setItems(filtered);
         VBox.setVgrow(table, Priority.ALWAYS);
 
@@ -77,19 +80,27 @@ public final class CompaniesPage extends ViewModel implements Page {
         execute(() -> ctx.api().companies(), items::setAll);
     }
 
+    @Override
+    public Optional<PrimaryAction> primaryAction() {
+        return Optional.of(new PrimaryAction("Nouvelle entreprise", "plus", this::openCreate));
+    }
+
+    @Override
+    public void focusSearch() {
+        search.requestFocus();
+    }
+
     private Node rowActions(CompanyDto c) {
-        Button toggle = new Button(c.active() ? "Désactiver" : "Activer");
-        toggle.getStyleClass().addAll(Styles.SMALL, c.active() ? Styles.DANGER : Styles.SUCCESS, Styles.FLAT);
-        toggle.setOnAction(e -> overlay.confirm(
-                c.active() ? "Désactiver " + c.name() + " ?" : "Activer " + c.name() + " ?",
-                c.active() ? "Plus aucun utilisateur de cette entreprise ne pourra se connecter. Les données sont conservées."
-                        : "Les utilisateurs actifs de cette entreprise pourront de nouveau se connecter.",
-                c.active() ? "Désactiver" : "Activer", c.active(),
-                () -> execute(() -> ctx.api().setCompanyActive(c.id(), !c.active()), updated -> {
-                    items.replaceAll(x -> x.id().equals(updated.id()) ? updated : x);
-                    overlay.success("Entreprise " + (updated.active() ? "activée" : "désactivée") + ".");
-                }, err -> overlay.error(err.getMessage()))));
-        return new HBox(toggle);
+        return Ui.rowMenu(Ui.menuItem(c.active() ? "Désactiver l'entreprise…" : "Activer l'entreprise…",
+                c.active() ? "power" : "check", () -> overlay.confirm(
+                        c.active() ? "Désactiver " + c.name() + " ?" : "Activer " + c.name() + " ?",
+                        c.active() ? "Plus aucun utilisateur de cette entreprise ne pourra se connecter. Les données sont conservées."
+                                : "Les utilisateurs actifs de cette entreprise pourront de nouveau se connecter.",
+                        c.active() ? "Désactiver" : "Activer", c.active(),
+                        () -> execute(() -> ctx.api().setCompanyActive(c.id(), !c.active()), updated -> {
+                            items.replaceAll(x -> x.id().equals(updated.id()) ? updated : x);
+                            overlay.success("Entreprise " + (updated.active() ? "activée" : "désactivée") + ".");
+                        }, err -> overlay.error(err.getMessage())))));
     }
 
     private void openCreate() {

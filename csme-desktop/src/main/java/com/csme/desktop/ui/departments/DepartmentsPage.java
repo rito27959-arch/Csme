@@ -1,5 +1,6 @@
 package com.csme.desktop.ui.departments;
 
+import java.util.Optional;
 import atlantafx.base.theme.Styles;
 import com.csme.desktop.AppContext;
 import com.csme.desktop.ui.common.Formats;
@@ -36,14 +37,21 @@ public final class DepartmentsPage extends ViewModel implements Page {
     private final ObservableList<DepartmentDto> items = FXCollections.observableArrayList();
     private final VBox root;
     private final boolean canUpdate;
+    private final boolean canCreate;
 
     public DepartmentsPage(AppContext ctx, Overlay overlay) {
         this.ctx = ctx;
         this.overlay = overlay;
-        boolean canCreate = ctx.session().can(ErpModule.DEPARTMENTS, Action.CREATE);
+        this.canCreate = ctx.session().can(ErpModule.DEPARTMENTS, Action.CREATE);
         this.canUpdate = ctx.session().can(ErpModule.DEPARTMENTS, Action.UPDATE);
 
-        TableView<DepartmentDto> table = Tables.table("Aucun département. Créez d'abord une agence, puis ses départements.");
+        Button emptyCreate = canCreate ? Ui.primary("Nouveau département", "plus") : null;
+        if (emptyCreate != null) {
+            emptyCreate.setOnAction(e -> openEditor(null));
+        }
+        TableView<DepartmentDto> table = Tables.table(Ui.emptyState("layers", "Aucun département",
+                "Organisez chaque agence en départements : ventes, comptabilité, logistique… "
+                        + "Vous pourrez ensuite y affecter les utilisateurs.", emptyCreate));
         table.getColumns().addAll(List.of(
                 Tables.text("Code", DepartmentDto::code),
                 Tables.text("Nom", DepartmentDto::name),
@@ -52,7 +60,8 @@ public final class DepartmentsPage extends ViewModel implements Page {
                 Tables.node("Statut", d -> d.active() ? Ui.badge("Actif", "success") : Ui.badge("Inactif", "neutral")),
                 Tables.text("Description", d -> d.description() == null ? "—" : d.description())));
         if (canUpdate) {
-            table.getColumns().add(Tables.node("", this::rowActions));
+            table.getColumns().add(Tables.menuColumn(this::rowActions));
+            Tables.onDoubleClick(table, this::openEditor);
         }
         table.setItems(items);
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -77,18 +86,21 @@ public final class DepartmentsPage extends ViewModel implements Page {
         execute(() -> ctx.api().departments(), items::setAll);
     }
 
+    @Override
+    public Optional<PrimaryAction> primaryAction() {
+        return canCreate ? Optional.of(new PrimaryAction("Nouveau département", "plus", () -> openEditor(null)))
+                : Optional.empty();
+    }
+
     private Node rowActions(DepartmentDto d) {
-        Button edit = Ui.iconButton("edit", "Modifier");
-        edit.setOnAction(e -> openEditor(d));
-        Button toggle = new Button(d.active() ? "Désactiver" : "Réactiver");
-        toggle.getStyleClass().addAll(Styles.SMALL, Styles.FLAT, d.active() ? Styles.DANGER : Styles.SUCCESS);
-        toggle.setOnAction(e -> execute(() -> ctx.api().setDepartmentActive(d.id(), !d.active()), updated -> {
-            replace(updated);
-            overlay.success("Département " + (updated.active() ? "réactivé" : "désactivé") + ".");
-        }, err -> overlay.error(err.getMessage())));
-        HBox box = new HBox(4, edit, toggle);
-        box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        return box;
+        return Ui.rowMenu(
+                Ui.menuItem("Modifier…", "edit", () -> openEditor(d)),
+                new javafx.scene.control.SeparatorMenuItem(),
+                Ui.menuItem(d.active() ? "Désactiver" : "Réactiver", d.active() ? "power" : "check",
+                        () -> execute(() -> ctx.api().setDepartmentActive(d.id(), !d.active()), updated -> {
+                            replace(updated);
+                            overlay.success("Département " + (updated.active() ? "réactivé" : "désactivé") + ".");
+                        }, err -> overlay.error(err.getMessage()))));
     }
 
     private void replace(DepartmentDto updated) {

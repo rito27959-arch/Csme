@@ -43,7 +43,8 @@ public final class AuditPage extends ViewModel implements Page {
         this.platform = platform;
         this.pager = new Pager(this::load);
 
-        TableView<AuditLogDto> table = Tables.table("Aucune opération enregistrée.");
+        TableView<AuditLogDto> table = Tables.table(Ui.emptyState("shield", "Aucune opération",
+                "Chaque connexion, création ou modification sera tracée ici : qui, quoi, quand et depuis où.", null));
         table.getColumns().addAll(List.of(
                 Tables.text("Date", a -> Formats.dateTime(a.occurredAt())),
                 Tables.text("Utilisateur", a -> a.actorEmail() == null ? "Système" : a.actorEmail()),

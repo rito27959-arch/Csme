@@ -1,5 +1,6 @@
 package com.csme.desktop.ui.users;
 
+import java.util.Optional;
 import atlantafx.base.theme.Styles;
 import com.csme.desktop.AppContext;
 import com.csme.desktop.ui.common.Formats;
@@ -42,7 +43,7 @@ public final class UsersPage extends ViewModel implements Page {
     private final AppContext ctx;
     private final Overlay overlay;
     private final ObservableList<UserDto> items = FXCollections.observableArrayList();
-    private final TextField search = new TextField();
+    private final TextField search = Ui.searchField("Rechercher un nom ou une adresse", 280);
     private final Pager pager;
     private final VBox root;
     private final boolean canCreate;
@@ -56,22 +57,22 @@ public final class UsersPage extends ViewModel implements Page {
         this.canUpdate = ctx.session().can(ErpModule.USERS, Action.UPDATE);
         this.pager = new Pager(this::load);
 
-        search.setPromptText("Nom ou adresse électronique");
-        search.setPrefWidth(280);
         PauseTransition debounce = new PauseTransition(Duration.millis(350));
         debounce.setOnFinished(e -> load(0));
         search.textProperty().addListener((obs, o, n) -> debounce.playFromStart());
 
-        TableView<UserDto> table = Tables.table("Aucun utilisateur ne correspond à la recherche.");
+        TableView<UserDto> table = Tables.table(Ui.emptyState("users", "Aucun utilisateur trouvé",
+                "Essayez un autre nom ou une autre adresse électronique.", null));
         table.getColumns().addAll(List.of(
-                Tables.node("Utilisateur", this::identity),
-                Tables.text("Poste", u -> u.jobTitle() == null ? "—" : u.jobTitle()),
-                Tables.text("Rôles", u -> u.roles().stream().map(RoleRef::name).collect(Collectors.joining(", "))),
-                Tables.text("Département", u -> u.department() == null ? "—" : u.department().name()),
-                Tables.node("Statut", this::status),
-                Tables.text("Dernière connexion", u -> Formats.dateTime(u.lastLoginAt()))));
+                wide(Tables.node("Utilisateur", this::identity), 250),
+                wide(Tables.text("Poste", u -> u.jobTitle() == null ? "—" : u.jobTitle()), 150),
+                wide(Tables.text("Rôles", u -> u.roles().stream().map(RoleRef::name).collect(Collectors.joining(", "))), 150),
+                wide(Tables.text("Département", u -> u.department() == null ? "—" : u.department().name()), 150),
+                wide(Tables.node("Statut", this::status), 100),
+                wide(Tables.text("Dernière connexion", u -> Formats.relative(u.lastLoginAt())), 130)));
         if (canUpdate) {
-            table.getColumns().add(Tables.node("", this::rowActions));
+            table.getColumns().add(Tables.menuColumn(this::rowActions));
+            Tables.onDoubleClick(table, u -> openEditor(u));
         }
         table.setItems(items);
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -105,10 +106,30 @@ public final class UsersPage extends ViewModel implements Page {
         });
     }
 
+    private static <C extends javafx.scene.control.TableColumn<?, ?>> C wide(C column, double width) {
+        column.setPrefWidth(width);
+        column.setMinWidth(width * 0.8);
+        return column;
+    }
+
     private Node identity(UserDto u) {
         Label name = new Label(u.fullName());
-        name.getStyleClass().add(Styles.TEXT_BOLD);
-        return new VBox(1, name, Ui.caption(u.email()));
+        name.getStyleClass().add("csme-medium");
+        HBox row = new HBox(10, Ui.avatar(u.fullName(), 30), new VBox(1, name, Ui.caption(u.email())));
+        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return row;
+    }
+
+    @Override
+    public Optional<PrimaryAction> primaryAction() {
+        return canCreate ? Optional.of(new PrimaryAction("Nouvel utilisateur", "plus", () -> openEditor(null)))
+                : Optional.empty();
+    }
+
+    @Override
+    public void focusSearch() {
+        search.requestFocus();
+        search.selectAll();
     }
 
     private Node status(UserDto u) {

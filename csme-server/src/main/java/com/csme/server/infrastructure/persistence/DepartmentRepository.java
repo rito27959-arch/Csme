@@ -16,6 +16,8 @@ public interface DepartmentRepository extends JpaRepository<Department, UUID> {
 
     boolean existsByCompanyIdAndCodeIgnoreCase(UUID companyId, String code);
 
+    long countByCompanyId(UUID companyId);
+
     @Query("select count(u) from AppUser u where u.department.id = :departmentId")
     long countUsers(@Param("departmentId") UUID departmentId);
 }

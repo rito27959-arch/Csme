@@ -25,6 +25,7 @@ public class CsmeDesktopApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        com.csme.desktop.ui.common.Fonts.load();
         ThemeService theme = new ThemeService();
         AppConfig config;
         try {
@@ -37,7 +38,7 @@ public class CsmeDesktopApp extends Application {
         ctx = new AppContext(config, session, new CsmeApi(new ApiClient(config.serverUrl(), session, config.version())), theme);
         session.setOnExpired(this::showLogin);
 
-        Scene scene = new Scene(root, 1280, 800);
+        Scene scene = new Scene(root, 1360, 860);
         scene.getStylesheets().add(Objects.requireNonNull(
                 CsmeDesktopApp.class.getResource("/com/csme/desktop/csme.css")).toExternalForm());
         stage.setScene(scene);

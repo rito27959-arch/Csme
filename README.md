@@ -2,7 +2,7 @@
 
 ERP de gestion commerciale multi-entreprises : application de bureau Windows **JavaFX + AtlantaFX (thème Cupertino, inspiré de macOS)**, API centrale **Spring Boot**, base **PostgreSQL** avec isolation des entreprises garantie par la base elle-même.
 
-> Version 0.4.0 — phases 1 à 5 du cahier des charges : architecture, interface principale, authentification, entreprises / agences / départements, utilisateurs, rôles et permissions.
+> Version 0.5.0 — phases 1 à 5 du cahier des charges : architecture, interface principale, authentification, entreprises / agences / départements, utilisateurs, rôles et permissions.
 
 ---
 
@@ -51,6 +51,27 @@ La portée « système » (contournement RLS) n'est accessible que par `SystemTr
 - Client : HTTPS obligatoire hors poste local, jetons en mémoire uniquement.
 
 ---
+
+## Interface
+
+Conçue selon les codes des applications Apple :
+
+- **Typographie Inter** (licence SIL OFL, incluse dans `csme-desktop/src/main/resources/com/csme/desktop/fonts`), grands titres de page.
+- **Barre latérale à tuiles colorées**, comme Réglages sur iOS ; les modules pas encore livrés sont repliés.
+- **Tableau de bord** : liste « Prise en main » tant que l'entreprise n'est pas configurée, alertes cliquables, actions rapides.
+- **États vides explicatifs**, bannières de confirmation, avatars, double-clic pour modifier, menu « … » sur chaque ligne.
+- **Mode clair / sombre** mémorisé ; la dernière adresse de connexion est proposée.
+
+### Raccourcis clavier
+
+| Raccourci | Action |
+|---|---|
+| `Ctrl` + `K` | Recherche universelle : aller à une page ou lancer une action |
+| `Ctrl` + `N` | Créer (nouvel utilisateur, nouvelle agence…) sur la page courante |
+| `Ctrl` + `F` | Rechercher dans la page |
+| `Ctrl` + `R` ou `F5` | Actualiser |
+| `Ctrl` + `1` … `9` | Aller directement à une rubrique |
+| `Entrée` / `Échap` | Valider / fermer la fenêtre ouverte |
 
 ## Démarrer en développement
 

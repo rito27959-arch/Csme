@@ -128,7 +128,7 @@ public final class SettingsPage extends ViewModel implements Page {
 
     private static Label section(String text) {
         Label l = new Label(text);
-        l.getStyleClass().add(atlantafx.base.theme.Styles.TITLE_4);
+        l.getStyleClass().add("csme-section-title");
         return l;
     }
 

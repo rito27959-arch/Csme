@@ -1,6 +1,8 @@
 package com.csme.server.application;
 
+import com.csme.server.domain.model.Company;
 import com.csme.server.infrastructure.persistence.AgencyRepository;
+import com.csme.server.infrastructure.persistence.DepartmentRepository;
 import com.csme.server.infrastructure.persistence.AuditLogRepository;
 import com.csme.server.infrastructure.persistence.CompanyRepository;
 import com.csme.server.infrastructure.persistence.RoleRepository;
@@ -31,6 +33,7 @@ public class DashboardService {
     private final CompanyRepository companies;
     private final UserRepository users;
     private final AgencyRepository agencies;
+    private final DepartmentRepository departments;
     private final RoleRepository roles;
     private final AuditLogRepository auditLogs;
     private final SystemTransactions system;
@@ -38,11 +41,12 @@ public class DashboardService {
     private final ZoneId zone;
 
     public DashboardService(CompanyRepository companies, UserRepository users, AgencyRepository agencies,
-                            RoleRepository roles, AuditLogRepository auditLogs, SystemTransactions system, Clock clock,
+                            DepartmentRepository departments, RoleRepository roles, AuditLogRepository auditLogs, SystemTransactions system, Clock clock,
                             @Value("${csme.reporting.time-zone:UTC}") String zone) {
         this.companies = companies;
         this.users = users;
         this.agencies = agencies;
+        this.departments = departments;
         this.roles = roles;
         this.auditLogs = auditLogs;
         this.system = system;
@@ -56,14 +60,19 @@ public class DashboardService {
         Instant now = clock.instant();
         Instant startOfToday = LocalDate.now(clock.withZone(zone)).atStartOfDay(zone).toInstant();
         Instant historyStart = startOfToday.minus(java.time.Duration.ofDays(HISTORY_DAYS - 1L));
-        String name = companies.findById(companyId).map(c -> c.getName()).orElse("");
+        Company company = companies.findById(companyId).orElse(null);
+        String name = company == null ? "" : company.getName();
+        boolean profileComplete = company != null && company.getLegalName() != null && company.getAddress() != null
+                && company.getPhone() != null && company.getTaxId() != null;
         return new CompanySummary(
                 name,
                 users.countByCompanyIdAndActive(companyId, true),
                 users.countByCompanyIdAndActive(companyId, false),
                 users.countByCompanyIdAndLockedUntilAfter(companyId, now),
                 agencies.countByCompanyId(companyId),
+                departments.countByCompanyId(companyId),
                 roles.countByCompanyId(companyId),
+                profileComplete,
                 auditLogs.countByCompanyIdAndActionAndOccurredAtGreaterThanEqual(companyId, "LOGIN_SUCCESS", startOfToday),
                 auditLogs.countByCompanyIdAndActionAndOccurredAtGreaterThanEqual(companyId, "LOGIN_FAILURE", startOfToday),
                 perDay(auditLogs.occurrencesForCompany(companyId, "LOGIN_SUCCESS", historyStart), historyStart),

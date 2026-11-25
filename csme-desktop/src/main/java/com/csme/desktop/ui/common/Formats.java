@@ -54,6 +54,27 @@ public final class Formats {
         return instant == null ? "—" : DATE.format(instant.atZone(ZoneId.systemDefault()));
     }
 
+    /** « à l'instant », « il y a 5 min », « il y a 3 h », « hier », puis la date. */
+    public static String relative(Instant instant) {
+        if (instant == null) {
+            return "—";
+        }
+        long seconds = java.time.Duration.between(instant, Instant.now()).getSeconds();
+        if (seconds < 60) {
+            return "à l'instant";
+        }
+        if (seconds < 3600) {
+            return "il y a " + (seconds / 60) + " min";
+        }
+        if (seconds < 86_400) {
+            return "il y a " + (seconds / 3600) + " h";
+        }
+        if (seconds < 172_800) {
+            return "hier";
+        }
+        return date(instant);
+    }
+
     public static String action(String code) {
         return code == null ? "" : ACTIONS.getOrDefault(code, code);
     }
