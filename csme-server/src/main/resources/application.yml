@@ -10,7 +10,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: ${CSME_DB_URL:jdbc:postgresql://localhost:5432/csme}
+    url: ${CSME_DB_URL:jdbc:postgresql://${CSME_DB_HOST:localhost}:${CSME_DB_PORT:5432}/${CSME_DB_NAME:csme}}
     # Rôle d'exécution : ni superutilisateur ni propriétaire, pour que PostgreSQL RLS s'applique.
     username: ${CSME_DB_APP_USER:csme_app}
     password: ${CSME_DB_APP_PASSWORD:}
@@ -20,7 +20,7 @@ spring:
   flyway:
     # Les migrations s'exécutent avec le rôle propriétaire du schéma, sur leur propre connexion
     # (URL explicite : la source de données de l'application est enveloppée par TenantAwareDataSource).
-    url: ${CSME_DB_URL:jdbc:postgresql://localhost:5432/csme}
+    url: ${CSME_DB_URL:jdbc:postgresql://${CSME_DB_HOST:localhost}:${CSME_DB_PORT:5432}/${CSME_DB_NAME:csme}}
     user: ${CSME_DB_OWNER_USER:csme_owner}
     password: ${CSME_DB_OWNER_PASSWORD:}
     locations: classpath:db/migration
